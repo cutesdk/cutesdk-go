@@ -41,7 +41,7 @@ func (w *Wxpay) UnifiedOrder(params map[string]string) (*gjson.Result, error) {
 	apiURL := fmt.Sprintf("%s/pay/unifiedorder", apiBase)
 	resp, err := goz.Post(apiURL, goz.Options{
 		XML:   params,
-		Debug: true,
+		Debug: w.opts.Debug,
 	})
 
 	body, err := resp.GetBody()

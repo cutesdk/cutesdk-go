@@ -10,13 +10,15 @@ import (
 // Code2Session 获取登录凭证
 func (w *Wxapp) Code2Session(code string) (*gjson.Result, error) {
 	apiURL := fmt.Sprintf(apiBase+"/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code", w.opts.Appid, w.opts.Appsecret, code)
-	res, err := goz.Get(apiURL)
+	resp, err := goz.Get(apiURL, goz.Options{
+		Debug: w.opts.Debug,
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return res.GetParsedBody()
+	return resp.GetParsedBody()
 }
 
 // DecryptData 用户信息解密

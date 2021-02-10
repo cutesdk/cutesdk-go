@@ -2,6 +2,7 @@ package wxpay
 
 // Options 微信支付参数
 type Options struct {
+	Debug     bool
 	MchID     string
 	SubMchID  string
 	APIKey    string

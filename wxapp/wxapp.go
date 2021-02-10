@@ -2,6 +2,7 @@ package wxapp
 
 // Options 配置项
 type Options struct {
+	Debug     bool
 	Appid     string
 	Appsecret string
 }
