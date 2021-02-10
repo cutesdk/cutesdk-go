@@ -9,8 +9,8 @@ import (
 
 // Code2Session 获取登录凭证
 func (w *Wxapp) Code2Session(code string) (*gjson.Result, error) {
-	uri := fmt.Sprintf(apiBase+"/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code", w.opts.Appid, w.opts.Appsecret, code)
-	res, err := goz.Get(uri)
+	apiURL := fmt.Sprintf(apiBase+"/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code", w.opts.Appid, w.opts.Appsecret, code)
+	res, err := goz.Get(apiURL)
 
 	if err != nil {
 		return nil, err
