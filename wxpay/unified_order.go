@@ -6,11 +6,10 @@ import (
 
 	"github.com/idoubi/goutils"
 	"github.com/idoubi/goz"
-	"github.com/tidwall/gjson"
 )
 
 // UnifiedOrder 统一下单
-func (w *Wxpay) UnifiedOrder(params map[string]string) (*gjson.Result, error) {
+func (w *Wxpay) UnifiedOrder(params map[string]string) (Result, error) {
 	if _, ok := params["mch_id"]; !ok {
 		params["mch_id"] = w.opts.MchID
 	}
@@ -55,10 +54,7 @@ func (w *Wxpay) UnifiedOrder(params map[string]string) (*gjson.Result, error) {
 		return nil, err
 	}
 
-	d := gjson.ParseBytes(jb)
-	xd := d.Get("xml")
-
-	return &xd, nil
+	return Result(jb), nil
 }
 
 // GetPayParams 获取支付参数
