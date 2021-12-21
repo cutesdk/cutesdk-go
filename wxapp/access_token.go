@@ -2,6 +2,7 @@ package wxapp
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/idoubi/goz"
@@ -10,8 +11,14 @@ import (
 
 // GetAccessToken 获取access_token
 func (w *Wxapp) GetAccessToken() (Result, error) {
-	apiURL := fmt.Sprintf(apiBase+"/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", w.opts.Appid, w.opts.Appsecret)
-	resp, err := goz.Get(apiURL, goz.Options{
+	queryParams := url.Values{}
+	queryParams.Set("grant_type", "client_credential")
+	queryParams.Set("appid", w.opts.Appid)
+	queryParams.Set("secret", w.opts.Secret)
+
+	apiUrl := apiBase + "/cgi-bin/token?" + queryParams.Encode()
+
+	resp, err := goz.Get(apiUrl, goz.Options{
 		Debug: w.opts.Debug,
 	})
 
@@ -25,10 +32,10 @@ func (w *Wxapp) GetAccessToken() (Result, error) {
 }
 
 // getAccessToken 获取access_token 内部调用
-func (w *Wxapp) getAccessToken() string {
+func (w *Wxapp) getAccessToken() (string, error) {
 	// 执行自定义的缓存逻辑
-	if w.opts.GetToken != nil {
-		return w.opts.GetToken(w)
+	if w.opts.GetAccessToken != nil {
+		return w.opts.GetAccessToken(w)
 	}
 
 	// 默认缓存
@@ -37,21 +44,26 @@ func (w *Wxapp) getAccessToken() string {
 	cacheKey := fmt.Sprintf("wxa:access_token:%s", w.opts.Appid)
 	cacheData, err := cache.Value(cacheKey)
 	if err == nil {
-		return cacheData.Data().(string)
+		// 取缓存的access_token返回
+		return cacheData.Data().(string), nil
 	}
 
+	// 请求接口获取access_token
 	res, err := w.GetAccessToken()
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	pres := res.Parsed()
 	accessToken := pres.Get("access_token").String()
-
-	if accessToken != "" {
-		expiresIn := pres.Get("expires_in").Int()
-		cache.Add(cacheKey, time.Duration(expiresIn-180)*time.Second, accessToken)
+	// 获取access_token失败
+	if accessToken == "" {
+		return "", fmt.Errorf("get access_token failed: %s\n", res)
 	}
 
-	return accessToken
+	// 缓存access_token
+	expiresIn := pres.Get("expires_in").Int()
+	cache.Add(cacheKey, time.Duration(expiresIn-180)*time.Second, accessToken)
+
+	return accessToken, nil
 }

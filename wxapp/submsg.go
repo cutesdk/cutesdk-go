@@ -8,7 +8,7 @@ import (
 
 // SendSubmsg 发送订阅通知
 func (w *Wxapp) SendSubmsg(params map[string]interface{}) (Result, error) {
-	apiURL := fmt.Sprintf(apiBase+"/cgi-bin/message/subscribe/send?access_token=%s", w.getAccessToken())
+	apiURL := fmt.Sprintf(apiBase+"/cgi-bin/message/subscribe/send?access_token=%s", "")
 	resp, err := goz.Post(apiURL, goz.Options{
 		Debug: w.opts.Debug,
 		JSON:  params,

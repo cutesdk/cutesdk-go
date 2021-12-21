@@ -59,9 +59,12 @@ func (w *Wxpay) UnifiedOrder(params map[string]string) (Result, error) {
 
 // GetPayParams 获取支付参数
 // wx.requestPayment(OBJECT) 接口需要的参数
-func (w *Wxpay) GetPayParams(prepayID string) map[string]string {
+func (w *Wxpay) GetPayParams(prepayID, appid string) map[string]string {
+	if appid == "" {
+		appid = w.opts.Appid
+	}
 	params := map[string]string{
-		"appId":     w.opts.Appid,
+		"appId":     appid,
 		"timeStamp": goutils.TimestampStr(),
 		"nonceStr":  goutils.NonceStr(32),
 		"package":   "prepay_id=" + prepayID,

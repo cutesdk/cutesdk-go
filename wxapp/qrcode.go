@@ -10,7 +10,7 @@ import (
 
 // GetUnlimitCode 获取小程序码 B接口
 func (w *Wxapp) GetUnlimitCode(params map[string]interface{}) (Result, error) {
-	apiURL := fmt.Sprintf(apiBase+"/wxa/getwxacodeunlimit?access_token=%s", w.getAccessToken())
+	apiURL := fmt.Sprintf(apiBase+"/wxa/getwxacodeunlimit?access_token=%s", "")
 	resp, err := goz.Post(apiURL, goz.Options{
 		JSON:  params,
 		Debug: w.opts.Debug,
