@@ -2,7 +2,6 @@ package wxopen
 
 import (
 	"github.com/idoubi/goutils/crypt"
-	"github.com/tidwall/gjson"
 )
 
 var (
@@ -34,17 +33,4 @@ func New(opts Options) *WxOpen {
 	return &WxOpen{
 		opts: opts,
 	}
-}
-
-// Result 响应结果
-type Result []byte
-
-// Parsed 获取解析后的数据
-func (r Result) Parsed() gjson.Result {
-	return gjson.ParseBytes(r)
-}
-
-// XmlParsed 解析xml数据
-func (r Result) XmlParsed() {
-
 }

@@ -26,7 +26,9 @@ func TestWxOpenGetNotifyData(t *testing.T) {
 		t.Fatalf("get notify data error: %v\n", err)
 	}
 
-	t.Errorf("notify data: %s", data)
+	if data.XmlParsed().Get("xml.InfoType").String() != "component_verify_ticket" {
+		t.Fatalf("get notify data failed")
+	}
 }
 
 func getWxOpen() *WxOpen {
