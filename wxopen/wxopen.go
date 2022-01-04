@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	apiBase = "https://api.mch.weixin.qq.com"
+	apiBase = "https://api.weixin.qq.com"
 )
 
 // Options 微信开放平台参数

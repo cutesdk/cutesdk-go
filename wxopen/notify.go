@@ -1,13 +1,63 @@
 package wxopen
 
 import (
+	"encoding/xml"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"sort"
 	"strings"
 
 	"github.com/idoubi/goutils/crypt"
 )
+
+// NotifyData 原始通知数据
+type NotifyData struct {
+	Appid      string `xml:"AppId"`
+	MsgEncrypt string `xml:"Encrypt"`
+}
+
+// GetNotifyData 获取通知数据
+func (w *WxOpen) GetNotifyData(req *http.Request) (Result, error) {
+	queryParams := req.URL.Query()
+	timestamp := queryParams.Get("timestamp")
+	nonce := queryParams.Get("nonce")
+	// signature := queryParams.Get("signature")
+	msgSignature := queryParams.Get("msg_signature")
+
+	if timestamp == "" || nonce == "" || msgSignature == "" {
+		return nil, fmt.Errorf("notify data with invalid params")
+	}
+
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return nil, fmt.Errorf("notify data with invalid body: %v", err)
+	}
+	defer req.Body.Close()
+
+	notifyData := &NotifyData{}
+	err = xml.Unmarshal(body, &notifyData)
+	if err != nil || notifyData.MsgEncrypt == "" || notifyData.Appid != w.opts.Appid {
+		return nil, fmt.Errorf("notify data unmarshal failed")
+	}
+
+	if err := w.VerifyNotifyData(timestamp, nonce, msgSignature, notifyData.MsgEncrypt); err != nil {
+		return nil, fmt.Errorf("notify data verify failed: %v", err)
+	}
+
+	res, err := w.DecryptNotifyData(notifyData.MsgEncrypt)
+	if err != nil {
+		return nil, fmt.Errorf("notify data decrypt failed: %v", err)
+	}
+
+	return res, nil
+}
+
+// Reply 回复消息
+func (w *WxOpen) Reply() error {
+	return nil
+}
 
 // VerifyNotifyData 验证通知数据
 // signature=sha1(sort(Token、timestamp、nonce, msg_encrypt))
@@ -25,8 +75,8 @@ func (w *WxOpen) VerifyNotifyData(timestamp, nonce, msgSignature, msgEncrypt str
 	return nil
 }
 
-// GetNotifyData 获取解密后的通知数据
-func (w *WxOpen) GetNotifyData(encryptedData string) (Result, error) {
+// DecryptNotifyData 解密通知数据
+func (w *WxOpen) DecryptNotifyData(encryptedData string) (Result, error) {
 	rawData, err := crypt.Base64Decode(encryptedData)
 	if err != nil {
 		return nil, err
