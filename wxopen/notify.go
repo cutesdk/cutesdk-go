@@ -18,6 +18,44 @@ type NotifyData struct {
 	MsgEncrypt string `xml:"Encrypt"`
 }
 
+// ReplyMsg 回复消息
+type ReplyMsg struct {
+	Type        string
+	TextContent string
+}
+
+// MsgHandler 消息处理器
+type MsgHandler func(msg *Result) *ReplyMsg
+
+// HandleNotify 处理通知
+func (w *WxOpen) HandleNotify(req *http.Request, resp http.ResponseWriter, msgHandler MsgHandler) error {
+	res, err := w.GetNotifyData(req)
+	if err != nil {
+		return err
+	}
+
+	if msgHandler != nil {
+		replyMsg := msgHandler(&res)
+		if replyMsg != nil {
+			resp.Write(([]byte(fmt.Sprintf("reply:%v", replyMsg))))
+		}
+	}
+
+	return nil
+}
+
+// ReplySuccess 回复字符串success
+func (w *WxOpen) ReplySuccess(resp http.ResponseWriter) error {
+	_, err := resp.Write([]byte("success"))
+
+	return err
+}
+
+// Reply 回复消息
+func (w *WxOpen) Reply() error {
+	return nil
+}
+
 // GetNotifyData 获取通知数据
 func (w *WxOpen) GetNotifyData(req *http.Request) (Result, error) {
 	queryParams := req.URL.Query()
@@ -52,11 +90,6 @@ func (w *WxOpen) GetNotifyData(req *http.Request) (Result, error) {
 	}
 
 	return res, nil
-}
-
-// Reply 回复消息
-func (w *WxOpen) Reply() error {
-	return nil
 }
 
 // VerifyNotifyData 验证通知数据

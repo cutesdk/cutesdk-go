@@ -1,11 +1,13 @@
-module github.com/cutesdk/cutesdk-go
+module github.com/cutesdk/cutesdk-go/wxapp
 
 go 1.17
 
+replace github.com/cutesdk/cutesdk-go => /data/code/cutesdk
+
 require (
+	github.com/cutesdk/cutesdk-go v0.0.0-00010101000000-000000000000
 	github.com/idoubi/goutils v1.0.1
 	github.com/idoubi/goz v1.2.1
-	github.com/muesli/cache2go v0.0.0-20201208071950-e3e970b4892f
 	github.com/tidwall/gjson v1.12.1
 )
 

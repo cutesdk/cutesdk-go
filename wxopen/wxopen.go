@@ -18,7 +18,7 @@ type Options struct {
 	aesKey         []byte // 32位
 }
 
-// WxOpen 微信对象
+// WxOpen 微信开发平台
 type WxOpen struct {
 	opts Options
 }
