@@ -1,35 +1,47 @@
 package wxapp
 
 import (
-	"errors"
 	"fmt"
-	"strings"
 
-	"github.com/idoubi/goz"
+	"github.com/cutesdk/cutesdk-go/common/request"
 )
 
-// GetUnlimitCode 获取小程序码 B接口
-func (w *WxApp) GetUnlimitCode(params map[string]interface{}) (Result, error) {
-	apiURL := fmt.Sprintf(apiBase+"/wxa/getwxacodeunlimit?access_token=%s", "")
-	resp, err := goz.Post(apiURL, goz.Options{
-		JSON:  params,
-		Debug: w.opts.Debug,
-	})
+// CreateQrcode: request wxacode.createQRCode api
+func (c *Client) CreateQrcode(params map[string]interface{}) (request.Result, error) {
+	return c.CreateQrcodeByType(1, params)
+}
 
+// GetQrcode: request wxacode.get api
+func (c *Client) GetQrcode(params map[string]interface{}) (request.Result, error) {
+	return c.CreateQrcodeByType(2, params)
+}
+
+// GetUnlimitedQrcode: request wxacode.getUnlimited api
+func (c *Client) GetUnlimitedQrcode(params map[string]interface{}) (request.Result, error) {
+	return c.CreateQrcodeByType(3, params)
+}
+
+// CreateQrcodeByType: create qrcode request different apis
+func (c *Client) CreateQrcodeByType(_type int8, params map[string]interface{}) (request.Result, error) {
+	accessToken, err := c.GetAccessToken()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get access_token failed: %v", err)
 	}
 
-	body, err := resp.GetBody()
-	if err != nil {
-		return nil, err
+	var uri string
+
+	switch _type {
+	case 1:
+		uri = fmt.Sprintf("/cgi-bin/wxaapp/createwxaqrcode?access_token=%s", accessToken)
+	case 2:
+		uri = fmt.Sprintf("/wxa/getwxacode?access_token=%s", accessToken)
+	case 3:
+		uri = fmt.Sprintf("/wxa/getwxacodeunlimit?access_token=%s", accessToken)
+	default:
+		return nil, fmt.Errorf("invalid type")
 	}
 
-	contentType := resp.GetHeaderLine("Content-Type")
-	// 返回的是二进制图片
-	if strings.Contains(contentType, "image/") {
-		return Result(body), nil
-	}
+	res, err := c.Post(uri, params)
 
-	return nil, errors.New(string(body))
+	return res, err
 }

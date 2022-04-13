@@ -1,4 +1,4 @@
-package wxapp
+package ttapp
 
 import (
 	"fmt"
@@ -35,12 +35,12 @@ func (t *AccessToken) GetToken() (string, error) {
 	}
 
 	pres := res.Parsed()
-	accessToken := pres.Get("access_token").String()
+	accessToken := pres.Get("data.access_token").String()
 	if accessToken == "" {
 		return "", fmt.Errorf("invalid access_token")
 	}
 
-	expire := (pres.Get("expires_in").Int() - 300) * int64(time.Second)
+	expire := (pres.Get("data.expires_in").Int() - 300) * int64(time.Second)
 
 	// set access_token to cache
 	cache.Set(cacheKey, accessToken, time.Duration(expire))
