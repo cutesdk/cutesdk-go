@@ -56,17 +56,12 @@ func (c *Client) CreateQrcode(data map[string]interface{}) (request.Result, erro
 }
 
 // SendSubscribeMsg: request send subscribe message api
-func (c *Client) SendSubscribeMsg(tplId, openid string, data map[string]string, args ...string) (request.Result, error) {
+func (c *Client) SendSubscribeMsg(tplId, openid string, data map[string]interface{}, page string) (request.Result, error) {
 	uri := "/api/apps/subscribe_notification/developer/v1/notify"
 
 	accessToken, err := c.GetAccessToken()
 	if err != nil {
 		return nil, fmt.Errorf("get access_token failed: %v", err)
-	}
-
-	page := ""
-	if len(args) > 0 {
-		page = args[0]
 	}
 
 	postData := map[string]interface{}{

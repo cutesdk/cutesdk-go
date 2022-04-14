@@ -15,6 +15,8 @@ type Options struct {
 	cacheHandler        cache.ICache
 	accessTokenCacheKey string
 	accessTokenHandler  token.IToken
+	jsapiTicketCacheKey string
+	jsapiTicketHandler  token.IToken
 }
 
 // OptionFunc is a function to init options
@@ -92,6 +94,30 @@ func (c *Client) SetAccessTokenHandler(handler token.IToken) error {
 // GetAccessTokenHandler: get access_token handler
 func (c *Client) GetAccessTokenHandler() token.IToken {
 	return c.opts.accessTokenHandler
+}
+
+// SetJsapiTicketCacheKey: set jsapi_ticket cache key
+func (c *Client) SetJsapiTicketCacheKey(cacheKey string) error {
+	c.opts.jsapiTicketCacheKey = cacheKey
+
+	return nil
+}
+
+// GetJsapiTicketCacheKey: get jsapi_ticket cache key
+func (c *Client) GetJsapiTicketCacheKey() string {
+	return c.opts.jsapiTicketCacheKey
+}
+
+// SetJsapiTicketHandler: set jsapi_ticket handler
+func (c *Client) SetJsapiTicketHandler(handler token.IToken) error {
+	c.opts.jsapiTicketHandler = handler
+
+	return nil
+}
+
+// GetJsapiTicketHandler: get jsapi_ticket handler
+func (c *Client) GetJsapiTicketHandler() token.IToken {
+	return c.opts.jsapiTicketHandler
 }
 
 // SetCacheHandler: set cache handler

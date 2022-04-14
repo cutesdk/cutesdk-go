@@ -78,6 +78,11 @@ func (c *Client) GetAccessToken() (string, error) {
 	return c.GetAccessTokenHandler().GetToken()
 }
 
+// GetJsapiTicket: get jsapi_ticket from cache or api
+func (c *Client) GetJsapiTicket() (string, error) {
+	return c.GetJsapiTicketHandler().GetToken()
+}
+
 // Get: request api with get method
 func (c *Client) Get(uri string, args ...map[string]interface{}) (request.Result, error) {
 	return c.GetRequestClient().Get(uri, args...)

@@ -51,7 +51,7 @@ func TestSendSubscribeMsg(t *testing.T) {
 
 	tplId := "MSG5877801d55d01588355646371eaaca417d88f15682"
 	openid := "L1p8S7Bwp2kweSGr"
-	data := map[string]string{
+	data := map[string]interface{}{
 		"打卡名称": "今日打卡提醒",
 		"备注":   "快去打卡吧~",
 	}
