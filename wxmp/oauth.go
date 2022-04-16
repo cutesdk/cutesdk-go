@@ -19,7 +19,7 @@ func (c *Client) GetOauthUrl(redirectUri, scope, state string) (*url.URL, error)
 	oauthBaseUri := "https://open.weixin.qq.com/connect/oauth2/authorize"
 	redirectUri = url.QueryEscape(redirectUri)
 
-	oauthUrl := fmt.Sprintf("%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect", oauthBaseUri, c.GetAppid(), redirectUri, state)
+	oauthUrl := fmt.Sprintf("%s?appid=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s#wechat_redirect", oauthBaseUri, c.GetAppid(), redirectUri, scope, state)
 
 	return url.Parse(oauthUrl)
 }
