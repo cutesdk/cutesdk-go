@@ -37,7 +37,7 @@ func (t *AccessToken) GetToken() (string, error) {
 	pres := res.Parsed()
 	accessToken := pres.Get("data.access_token").String()
 	if accessToken == "" {
-		return "", fmt.Errorf("invalid access_token")
+		return "", fmt.Errorf("fetch token failed: %s", res)
 	}
 
 	expire := (pres.Get("data.expires_in").Int() - 300) * int64(time.Second)
