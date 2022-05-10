@@ -29,6 +29,16 @@ func (t *AccessToken) GetToken() (string, error) {
 	}
 
 	// get access_token from api
+	return t.RefreshToken()
+}
+
+// RefreshToken: refresh access_token
+func (t *AccessToken) RefreshToken() (string, error) {
+	cacheKey := t.client.GetAccessTokenCacheKey()
+
+	cache := t.client.GetCacheHandler()
+
+	// get access_token from api
 	res, err := t.client.FetchAccessToken()
 	if err != nil {
 		return "", fmt.Errorf("fetch token failed: %v", err)

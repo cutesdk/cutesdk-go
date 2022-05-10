@@ -69,3 +69,13 @@ func (c *RedisCache) Get(key string) (interface{}, error) {
 
 	return value, err
 }
+
+// Delete: delete data from cache
+func (c *RedisCache) Delete(key string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+
+	_, err := c.cache.Do(ctx, "DEL", key).Result()
+
+	return err
+}

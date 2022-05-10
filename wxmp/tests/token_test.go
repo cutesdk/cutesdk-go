@@ -28,3 +28,27 @@ func TestRefreshAccessToken(t *testing.T) {
 
 	t.Error(res, err)
 }
+
+func TestFetchJsapiTicket(t *testing.T) {
+	client := getClient()
+
+	res, err := client.FetchJsapiTicket()
+
+	t.Error(res, err)
+}
+
+func TestGetJsapiTicket(t *testing.T) {
+	client := getClient()
+
+	res, err := client.GetJsapiTicket()
+
+	t.Error(res, err)
+}
+
+func TestRefreshJsapiTicket(t *testing.T) {
+	client := getClient()
+
+	res, err := client.RefreshJsapiTicket()
+
+	t.Error(res, err)
+}

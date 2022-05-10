@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/cutesdk/cutesdk-go/common/app"
+	"github.com/cutesdk/cutesdk-go/common/request"
 	"github.com/cutesdk/cutesdk-go/ttapp"
 )
 
@@ -11,7 +11,15 @@ var (
 )
 
 func getClient() *ttapp.Client {
-	client, err := ttapp.NewClient(appid, secret, app.WithDebug(true))
+	opts := &ttapp.Options{
+		Appid:  appid,
+		Secret: secret,
+		Request: &request.Options{
+			Debug: true,
+		},
+	}
+
+	client, err := ttapp.NewClient(opts)
 	if err != nil {
 		panic(err)
 	}

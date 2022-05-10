@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/cutesdk/cutesdk-go/common/app"
+	"github.com/cutesdk/cutesdk-go/common/request"
 	"github.com/cutesdk/cutesdk-go/wxmp"
 )
 
@@ -11,7 +11,14 @@ var (
 )
 
 func getClient() *wxmp.Client {
-	client, err := wxmp.NewClient(appid, secret, app.WithDebug(true))
+	opts := &wxmp.Options{
+		Appid:  appid,
+		Secret: secret,
+		Request: &request.Options{
+			Debug: true,
+		},
+	}
+	client, err := wxmp.NewClient(opts)
 	if err != nil {
 		panic(err)
 	}

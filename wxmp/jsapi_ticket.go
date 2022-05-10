@@ -29,6 +29,16 @@ func (t *JsapiTicket) GetToken() (string, error) {
 	}
 
 	// get jsapi_ticket from api
+	return t.RefreshToken()
+}
+
+// RefreshToken: get jsapi_ticket
+func (t *JsapiTicket) RefreshToken() (string, error) {
+	cacheKey := t.client.GetJsapiTicketCacheKey()
+
+	cache := t.client.GetCacheHandler()
+
+	// get jsapi_ticket from api
 	res, err := t.client.FetchJsapiTicket()
 	if err != nil {
 		return "", fmt.Errorf("fetch ticket failed: %v", err)

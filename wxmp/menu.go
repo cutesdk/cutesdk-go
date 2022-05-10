@@ -10,7 +10,7 @@ import (
 func (c *Client) GetCurrentMenu() (request.Result, error) {
 	accessToken, err := c.GetAccessToken()
 	if err != nil {
-		return nil, fmt.Errorf("get access_token failed: %v", accessToken)
+		return nil, fmt.Errorf("get access_token failed: %v", err)
 	}
 
 	uri := fmt.Sprintf("/cgi-bin/get_current_selfmenu_info?access_token=%s", accessToken)

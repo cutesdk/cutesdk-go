@@ -1,12 +1,24 @@
 package wxopen
 
-// PushTicket api_start_push_ticket
-func (w *WxOpen) PushTicket() (Result, error) {
-	apiPath := "/cgi-bin/component/api_start_push_ticket"
+import (
+	"fmt"
 
-	res, err := w.ApiPost(apiPath, nil, map[string]interface{}{
-		"component_appid":  w.opts.Appid,
-		"component_secret": w.opts.AppSecret,
+	"github.com/cutesdk/cutesdk-go/common/request"
+)
+
+// FetchComponentAccessToken: request api to fetch component_access_token
+func (c *Client) FetchComponentAccessToken() (request.Result, error) {
+	componentVerifyTicket, err := c.GetComponentVerifyTicket()
+	if err != nil {
+		return nil, fmt.Errorf("get component_verify_ticket failed: %v", err)
+	}
+
+	uri := "/cgi-bin/component/api_component_token"
+
+	res, err := c.Post(uri, map[string]interface{}{
+		"component_verify_ticket": componentVerifyTicket,
+		"component_appid":         c.GetComponentAppid(),
+		"component_appsecret":     c.GetComponentAppsecret(),
 	})
 
 	return res, err

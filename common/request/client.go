@@ -6,11 +6,11 @@ import (
 
 // Client: request client
 type Client struct {
-	opts Options
+	opts *Options
 }
 
 // NewClient: new request client
-func NewClient(opts Options) *Client {
+func NewClient(opts *Options) *Client {
 	return &Client{opts}
 }
 

@@ -5,22 +5,6 @@ import (
 	"testing"
 )
 
-func TestFetchJsapiTicket(t *testing.T) {
-	client := getClient()
-
-	res, err := client.FetchJsapiTicket()
-
-	t.Error(res, err)
-}
-
-func TestGetJsapiTicket(t *testing.T) {
-	client := getClient()
-
-	res, err := client.GetJsapiTicket()
-
-	t.Error(res, err)
-}
-
 func TestGetJssdkConfig(t *testing.T) {
 	client := getClient()
 

@@ -6,15 +6,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cutesdk/cutesdk-go/common/app"
+	"github.com/cutesdk/cutesdk-go/common/cache"
 	"github.com/cutesdk/cutesdk-go/ttapp"
 	"github.com/idoubi/goutils"
 )
 
 func TestSetFileCache(t *testing.T) {
-	client, err := ttapp.NewClient(appid, secret, app.WithCache("file", map[string]interface{}{
-		"dir": "./cache123",
-	}))
+	opts := &ttapp.Options{
+		Appid:  appid,
+		Secret: secret,
+		Cache: &cache.Options{
+			Driver: "file",
+			Conf: map[string]interface{}{
+				"dir": "./ttappcache",
+			},
+		},
+	}
+	client, err := ttapp.NewClient(opts)
 
 	if err != nil {
 		t.Fatalf("new client error: %v", err)
@@ -25,10 +33,18 @@ func TestSetFileCache(t *testing.T) {
 }
 
 func TestSetRedisCache(t *testing.T) {
-	client, err := ttapp.NewClient(appid, secret, app.WithCache("redis", map[string]interface{}{
-		"dsn":     "redis://:test123@127.0.0.1:6379/1",
-		"timeout": "3s",
-	}))
+	opts := &ttapp.Options{
+		Appid:  appid,
+		Secret: secret,
+		Cache: &cache.Options{
+			Driver: "redis",
+			Conf: map[string]interface{}{
+				"dsn":     "redis://:@127.0.0.1:6379/1",
+				"timeout": "3s",
+			},
+		},
+	}
+	client, err := ttapp.NewClient(opts)
 
 	if err != nil {
 		t.Fatalf("new client error: %v", err)
@@ -40,10 +56,18 @@ func TestSetRedisCache(t *testing.T) {
 }
 
 func TestSetAccessTokenCacheKey(t *testing.T) {
-	client, err := ttapp.NewClient(appid, secret, app.WithCache("redis", map[string]interface{}{
-		"dsn":     "redis://:test123@127.0.0.1:6379/1",
-		"timeout": "3s",
-	}))
+	opts := &ttapp.Options{
+		Appid:  appid,
+		Secret: secret,
+		Cache: &cache.Options{
+			Driver: "redis",
+			Conf: map[string]interface{}{
+				"dsn":     "redis://:@127.0.0.1:6379/1",
+				"timeout": "3s",
+			},
+		},
+	}
+	client, err := ttapp.NewClient(opts)
 
 	if err != nil {
 		t.Fatalf("new client error: %v", err)
@@ -87,6 +111,19 @@ func newCustomAccessTokenHandler(client *ttapp.Client) *customAccessTokenHandler
 }
 
 func (c *customAccessTokenHandler) GetToken() (string, error) {
+	cacheKey := c.client.GetAccessTokenCacheKey() + "custom"
+
+	cache := c.client.GetCacheHandler()
+
+	// get access_token from cache
+	if v, err := cache.Get(cacheKey); err == nil && v != nil {
+		return v.(string), nil
+	}
+
+	return c.RefreshToken()
+}
+
+func (c *customAccessTokenHandler) RefreshToken() (string, error) {
 	cacheKey := c.client.GetAccessTokenCacheKey() + "custom"
 
 	cache := c.client.GetCacheHandler()
