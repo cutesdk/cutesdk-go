@@ -12,13 +12,28 @@ import (
 	"github.com/idoubi/goutils/crypt"
 )
 
-// NotifyData: notify data
-type NotifyData struct {
+// NotifyInfo: notify info data
+type NotifyInfo struct {
 	Appid                 string `xml:"AppId"`
-	MsgEncrypt            string `xml:"Encrypt,omitempty"`
-	CreateTime            string `xml:"CreateTime,omitempty"`
 	InfoType              string `xml:"InfoType,omitempty"`
 	ComponentVerifyTicket string `xml:"ComponentVerifyTicket,omitempty"`
+}
+
+// NotifyMessage: notify msg
+type NotifyMessage struct {
+	ToUserName   string `xml:"ToUserName,omitempty"`
+	FromUserName string `xml:"FromUserName,omitempty"`
+	MsgType      string `xml:"MsgType,omitempty"`
+	Content      string `xml:"Content,omitempty"`
+	MsgId        string `xml:"MsgId,omitempty"`
+}
+
+// NotifyData: notify data
+type NotifyData struct {
+	NotifyInfo
+	NotifyMessage
+	MsgEncrypt string `xml:"Encrypt,omitempty"`
+	CreateTime string `xml:"CreateTime,omitempty"`
 }
 
 // ReplyMsg 回复消息
@@ -134,6 +149,8 @@ func (s *Server) DecryptNotifyData(encryptedData string) (*NotifyData, error) {
 	if string(appidB) != s.GetComponentAppid() {
 		return nil, errors.New("decrypt error: invalid appid")
 	}
+
+	fmt.Println(string(contentB))
 
 	notifyData := &NotifyData{}
 	if err := xml.Unmarshal(contentB, &notifyData); err != nil {
