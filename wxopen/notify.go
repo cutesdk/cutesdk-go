@@ -90,8 +90,12 @@ func (s *Server) GetNotifyData(req *http.Request) (*NotifyData, error) {
 
 	notifyData := &NotifyData{}
 	err = xml.Unmarshal(body, &notifyData)
-	if err != nil || notifyData.MsgEncrypt == "" || notifyData.Appid != s.GetComponentAppid() {
+	if err != nil || notifyData.MsgEncrypt == "" {
 		return nil, fmt.Errorf("notify data unmarshal failed")
+	}
+
+	if notifyData.Appid != "" && notifyData.Appid != s.GetComponentAppid() {
+		return nil, fmt.Errorf("notify data with invalid appid")
 	}
 
 	if err := s.VerifyNotifyData(timestamp, nonce, msgSignature, notifyData.MsgEncrypt); err != nil {
