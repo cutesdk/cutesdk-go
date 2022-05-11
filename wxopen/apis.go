@@ -23,3 +23,31 @@ func (c *Client) FetchComponentAccessToken() (request.Result, error) {
 
 	return res, err
 }
+
+// StartPushTicket: start push component_verify_ticket
+func (c *Client) StartPushTicket() (request.Result, error) {
+	uri := "/cgi-bin/component/api_start_push_ticket"
+
+	res, err := c.Post(uri, map[string]interface{}{
+		"component_appid":  c.GetComponentAppid(),
+		"component_secret": c.GetComponentAppsecret(),
+	})
+
+	return res, err
+}
+
+// CreatePreauthCode: create preauthcode
+func (c *Client) CreatePreauthCode() (request.Result, error) {
+	componentAccessToken, err := c.GetComponentAccessToken()
+	if err != nil {
+		return nil, fmt.Errorf("get component_access_token failed: %v", err)
+	}
+
+	uri := fmt.Sprintf("/cgi-bin/component/api_create_preauthcode?component_access_token=%s", componentAccessToken)
+
+	res, err := c.Post(uri, map[string]interface{}{
+		"component_appid": c.GetComponentAppid(),
+	})
+
+	return res, err
+}

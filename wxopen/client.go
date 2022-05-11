@@ -83,6 +83,11 @@ func (c *Client) RefreshComponentAccessToken() (string, error) {
 	return c.GetComponentAccessTokenHandler().RefreshToken()
 }
 
+// SetComponentAccessToken: set component_access_token
+func (c *Client) SetComponentAccessToken(token string, expire time.Duration) error {
+	return c.GetComponentAccessTokenHandler().SetToken(token, expire)
+}
+
 // GetComponentVerifyTicket: get component_verify_ticket from cache
 func (c *Client) GetComponentVerifyTicket() (string, error) {
 	return c.GetComponentVerifyTicketHandler().GetToken()
@@ -91,6 +96,11 @@ func (c *Client) GetComponentVerifyTicket() (string, error) {
 // RefreshComponentVerifyTicket: refresh component_verify_ticket
 func (c *Client) RefreshComponentVerifyTicket() (string, error) {
 	return c.GetComponentVerifyTicketHandler().RefreshToken()
+}
+
+// SetComponentVerifyTicket: set component_verify_ticket
+func (c *Client) SetComponentVerifyTicket(token string, expire time.Duration) error {
+	return c.GetComponentVerifyTicketHandler().SetToken(token, expire)
 }
 
 // Get: request api with get method

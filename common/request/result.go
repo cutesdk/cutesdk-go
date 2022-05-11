@@ -3,6 +3,7 @@ package request
 import (
 	"os"
 
+	"github.com/idoubi/goutils/convert"
 	"github.com/tidwall/gjson"
 )
 
@@ -14,6 +15,13 @@ func (r Result) Parsed() gjson.Result {
 	return gjson.ParseBytes(r)
 }
 
+// XmlParsed 解析xml数据
+func (r Result) XmlParsed() gjson.Result {
+	jb, _ := convert.Xml2Json(r)
+
+	return gjson.ParseBytes(jb).Get("xml")
+}
+
 // String print the result as string
 func (r Result) String() string {
 	return string(r)
@@ -22,6 +30,11 @@ func (r Result) String() string {
 // Get a sub item from the Parsed data
 func (r Result) Get(key string) gjson.Result {
 	return r.Parsed().Get(key)
+}
+
+// GetString: get item with string format
+func (r Result) GetString(key string) string {
+	return r.Parsed().Get(key).String()
 }
 
 // SaveAsFile: save as file

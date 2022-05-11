@@ -57,3 +57,13 @@ func (t *JsapiTicket) RefreshToken() (string, error) {
 
 	return jsapiTicket, nil
 }
+
+// SetToken: set jsapi_ticket to cache
+func (t *JsapiTicket) SetToken(token string, expire time.Duration) error {
+	cacheKey := t.client.GetJsapiTicketCacheKey()
+
+	cache := t.client.GetCacheHandler()
+
+	// set jsapi_ticket to cache
+	return cache.Set(cacheKey, token, expire)
+}

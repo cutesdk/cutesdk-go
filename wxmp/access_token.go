@@ -57,3 +57,13 @@ func (t *AccessToken) RefreshToken() (string, error) {
 
 	return accessToken, nil
 }
+
+// SetToken: set access_token to cache
+func (t *AccessToken) SetToken(token string, expire time.Duration) error {
+	cacheKey := t.client.GetAccessTokenCacheKey()
+
+	cache := t.client.GetCacheHandler()
+
+	// set access_token to cache
+	return cache.Set(cacheKey, token, expire)
+}

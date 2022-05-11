@@ -1,14 +1,17 @@
 package tests
 
-// import "testing"
+import (
+	"testing"
+	"time"
+)
 
-// func TestGetComponentAccessToken(t *testing.T) {
-// 	w := getWxOpen()
+func TestSetComponentVerifyTicket(t *testing.T) {
+	c := getClient()
 
-// 	res, err := w.GetComponentAccessToken()
-// 	if err != nil {
-// 		t.Fatalf("get component access_token error: %v\n", err)
-// 	}
+	ticket := "ticket@@@BDJg_t76rRbAT-riW9cfI04C0v4eUR93de82xXAPf3abXgfCim4u8tMIRZY35v8iK20LGhiVvBqA9d9AjqAZgA"
+	expire := 720 * time.Minute
 
-// 	t.Errorf("%s", res)
-// }
+	err := c.SetComponentVerifyTicket(ticket, expire)
+
+	t.Error(err)
+}

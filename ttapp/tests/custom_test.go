@@ -145,3 +145,12 @@ func (c *customAccessTokenHandler) RefreshToken() (string, error) {
 
 	return res.Get("data.access_token").String(), nil
 }
+
+func (c *customAccessTokenHandler) SetToken(token string, expire time.Duration) error {
+	cacheKey := c.client.GetAccessTokenCacheKey() + "custom"
+
+	cache := c.client.GetCacheHandler()
+
+	// set access_token to cache
+	return cache.Set(cacheKey, token, expire)
+}

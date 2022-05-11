@@ -57,3 +57,13 @@ func (t *ComponentAccessToken) RefreshToken() (string, error) {
 
 	return accessToken, nil
 }
+
+// SetToken: set component_access_token to cache
+func (t *ComponentAccessToken) SetToken(token string, expire time.Duration) error {
+	cacheKey := t.client.GetComponentAccessTokenCacheKey()
+
+	cache := t.client.GetCacheHandler()
+
+	// set component_access_token to cache
+	return cache.Set(cacheKey, token, expire)
+}

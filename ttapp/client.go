@@ -74,6 +74,11 @@ func (c *Client) RefreshAccessToken() (string, error) {
 	return c.GetAccessTokenHandler().RefreshToken()
 }
 
+// SetAccessToken: set access_token
+func (c *Client) SetAccessToken(token string, expire time.Duration) error {
+	return c.GetAccessTokenHandler().SetToken(token, expire)
+}
+
 // Get: request api with get method
 func (c *Client) Get(uri string, args ...map[string]interface{}) (request.Result, error) {
 	return c.GetRequestClient().Get(uri, args...)

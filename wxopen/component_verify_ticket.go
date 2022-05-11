@@ -2,6 +2,7 @@ package wxopen
 
 import (
 	"fmt"
+	"time"
 )
 
 // ComponentVerifyTicket: default component_verify_ticket handler
@@ -39,4 +40,14 @@ func (t *ComponentVerifyTicket) RefreshToken() (string, error) {
 	cache.Delete(cacheKey)
 
 	return "", fmt.Errorf("invalid component_verify_ticket")
+}
+
+// SetToken: set component_verify_ticket to cache
+func (t *ComponentVerifyTicket) SetToken(token string, expire time.Duration) error {
+	cacheKey := t.client.GetComponentVerifyTicketCacheKey()
+
+	cache := t.client.GetCacheHandler()
+
+	// set component_verify_ticket to cache
+	return cache.Set(cacheKey, token, expire)
 }

@@ -12,6 +12,9 @@ type Options struct {
 	Cache              *cache.Options
 	ComponentAppid     string
 	ComponentAppsecret string
+	VerifyToken        string
+	EncodingAesKey     string // 43 bit
+	aesKey             []byte // 32 bit
 }
 
 // GetRequestClient: get request handler

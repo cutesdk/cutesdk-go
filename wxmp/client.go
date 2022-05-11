@@ -83,6 +83,11 @@ func (c *Client) RefreshAccessToken() (string, error) {
 	return c.GetAccessTokenHandler().RefreshToken()
 }
 
+// SetAccessToken: set access_token
+func (c *Client) SetAccessToken(token string, expire time.Duration) error {
+	return c.GetAccessTokenHandler().SetToken(token, expire)
+}
+
 // GetJsapiTicket: get jsapi_ticket from cache or api
 func (c *Client) GetJsapiTicket() (string, error) {
 	return c.GetJsapiTicketHandler().GetToken()
@@ -91,6 +96,11 @@ func (c *Client) GetJsapiTicket() (string, error) {
 // RefreshJsapiTicket: refresh jsapi_ticket
 func (c *Client) RefreshJsapiTicket() (string, error) {
 	return c.GetJsapiTicketHandler().RefreshToken()
+}
+
+// SetJsapiTicket: set jsapi_ticket
+func (c *Client) SetJsapiTicket(token string, expire time.Duration) error {
+	return c.GetJsapiTicketHandler().SetToken(token, expire)
 }
 
 // Get: request api with get method
