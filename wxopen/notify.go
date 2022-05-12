@@ -1,13 +1,13 @@
 package wxopen
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/cutesdk/cutesdk-go/common/request"
-	"github.com/idoubi/goutils"
 )
 
 // NotifyInfo: notify info data
@@ -35,37 +35,9 @@ type NotifyData struct {
 	Encrypt    string `xml:"Encrypt"`
 }
 
-// NewText: new text reply msg
-func (msg *NotifyMsg) NewText(content string) *ReplyMsg {
-	return &ReplyMsg{
-		ToUserName:   CDATAText(msg.FromUserName),
-		FromUserName: CDATAText(msg.ToUserName),
-		CreateTime:   goutils.TimestampStr(),
-		MsgType:      "text",
-		Content:      CDATAText(content),
-	}
-}
-
-// MsgHandler: notify message handler
-type MsgHandler func(msg request.Result)
-
-// Listen: listen notify
-func (s *Server) Listen(req *http.Request, resp http.ResponseWriter, msgHandler MsgHandler) error {
-	res, err := s.GetNotifyData(req)
-	if err != nil {
-		return err
-	}
-
-	if msgHandler != nil {
-		msgHandler(res)
-	}
-
-	return nil
-}
-
 // GetNotifyInfo: get notify info
 func (s *Server) GetNotifyInfo(req *http.Request) (*NotifyInfo, error) {
-	res, err := s.GetNotifyData(req)
+	res, err := s.GetRawMessage(req)
 	if err != nil {
 		return nil, fmt.Errorf("get notify data failed: %v", err)
 	}
@@ -78,9 +50,9 @@ func (s *Server) GetNotifyInfo(req *http.Request) (*NotifyInfo, error) {
 	return notifyInfo, nil
 }
 
-// GetNotifyMsg: get notify message
-func (s *Server) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
-	res, err := s.GetNotifyData(req)
+// GetMessage: get notify message
+func (s *Server) GetMessage(req *http.Request) (*NotifyMsg, error) {
+	res, err := s.GetRawMessage(req)
 	if err != nil {
 		return nil, fmt.Errorf("get notify data failed: %v", err)
 	}
@@ -93,8 +65,8 @@ func (s *Server) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
 	return notifyMsg, nil
 }
 
-// GetNotifyData: get notify data
-func (s *Server) GetNotifyData(req *http.Request) (request.Result, error) {
+// GetRawMessage: get notify data
+func (s *Server) GetRawMessage(req *http.Request) (request.Result, error) {
 	queryParams := req.URL.Query()
 	timestamp := queryParams.Get("timestamp")
 	nonce := queryParams.Get("nonce")
@@ -108,7 +80,7 @@ func (s *Server) GetNotifyData(req *http.Request) (request.Result, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid notify data: %v", err)
 	}
-	defer req.Body.Close()
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
 	notifyData := &NotifyData{}
 	err = xml.Unmarshal(body, &notifyData)
