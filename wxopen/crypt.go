@@ -2,7 +2,6 @@ package wxopen
 
 import (
 	"bytes"
-	"encoding/binary"
 	"errors"
 	"sort"
 	"strings"
@@ -99,9 +98,11 @@ func getBytesLen(bytes []byte) int {
 }
 
 // getLenBytes
-func getLenBytes(length int) []byte {
-	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, int32(length))
-
-	return buf.Bytes()
+func getLenBytes(num int) []byte {
+	return []byte{
+		(byte)(num >> 24 & 0xFF),
+		(byte)(num >> 16 & 0xF),
+		(byte)(num >> 8 & 0xFF),
+		(byte)(num & 0xFF),
+	}
 }
