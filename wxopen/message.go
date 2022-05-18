@@ -9,6 +9,10 @@ import (
 
 // ReplyText: new text reply msg
 func (msg *NotifyMsg) ReplyText(content string) *ReplyMsg {
+	if content == "" {
+		return nil
+	}
+
 	return &ReplyMsg{
 		ToUserName:   CDATAText(msg.FromUserName),
 		FromUserName: CDATAText(msg.ToUserName),
@@ -35,7 +39,7 @@ func (s *Server) Listen(req *http.Request, resp http.ResponseWriter, msgHandler 
 
 	replyMsg := msgHandler(msg)
 	if replyMsg == nil {
-		return nil
+		return s.ReplySuccess(resp)
 	}
 
 	return s.ReplyMessage(resp, replyMsg)

@@ -62,6 +62,30 @@ func (c *Client) Post(uri string, args ...map[string]interface{}) (Result, error
 	return c.Request(method, uri, opts)
 }
 
+// PostXml: make api request with post method and xml data
+func (c *Client) PostXml(uri string, args ...map[string]interface{}) (Result, error) {
+	data := map[string]interface{}{}
+	headers := map[string]interface{}{}
+
+	if len(args) > 0 {
+		data = args[0]
+	}
+	if len(args) > 1 {
+		headers = args[1]
+	}
+
+	method := "POST"
+
+	opts := goz.Options{
+		Debug:   c.opts.Debug,
+		Timeout: float32(c.opts.Timeout.Seconds()),
+		XML:     data,
+		Headers: headers,
+	}
+
+	return c.Request(method, uri, opts)
+}
+
 // Request: make api request
 func (c *Client) Request(method string, uri string, opts goz.Options) (Result, error) {
 	cli := goz.NewClient()

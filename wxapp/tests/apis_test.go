@@ -5,7 +5,7 @@ import "testing"
 func TestCode2Session(t *testing.T) {
 	client := getClient()
 
-	code := "091pS8Ga1yE4ZC0LtvIa1rPq9g3pS8GY"
+	code := "051kk0nl2jfTd94EqBnl2cp1IS3kk0nO"
 
 	res, err := client.Code2Session(code)
 
