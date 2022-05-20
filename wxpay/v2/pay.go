@@ -1,7 +1,6 @@
 package wxpay
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -24,7 +23,18 @@ func (c *Client) UnifiedOrder(params map[string]interface{}) (request.Result, er
 	return res, err
 }
 
-func (c *Client) GetPayParams(params map[string]interface{}) (request.Result, error) {
+// PayParams: pay params
+type PayParams struct {
+	Appid     string `json:"appId"`
+	Timestamp string `json:"timeStamp"`
+	NonceStr  string `json:"nonceStr"`
+	Package   string `json:"package"`
+	SignType  string `json:"signType"`
+	PaySign   string `json:"paySign"`
+}
+
+// GetPayParams: get pay params
+func (c *Client) GetPayParams(params map[string]interface{}) (*PayParams, error) {
 	if params == nil {
 		return nil, fmt.Errorf("invalid params")
 	}
@@ -46,23 +56,37 @@ func (c *Client) GetPayParams(params map[string]interface{}) (request.Result, er
 		return nil, fmt.Errorf("invalid sign_type")
 	}
 
-	payParams := map[string]interface{}{}
+	appid := c.GetAppid()
+	nonce := goutils.NonceStr(32)
+	timestamp := goutils.TimestampStr()
+	_package := fmt.Sprintf("prepay_id=%s", prepayId)
 
-	payParams["appId"] = c.GetAppid()
-	payParams["timeStamp"] = goutils.TimestampStr()
-	payParams["nonceStr"] = goutils.NonceStr(32)
-	payParams["package"] = fmt.Sprintf("prepay_id=%s", prepayId)
-	payParams["signType"] = signType
-
-	if signType == "HMAC-SHA256" {
-		payParams["paySign"] = c.SignWithHmacSha256(payParams)
-	} else {
-		payParams["paySign"] = c.SignWithMd5(payParams)
+	payParams := map[string]interface{}{
+		"appId":     appid,
+		"nonceStr":  nonce,
+		"timeStamp": timestamp,
+		"package":   _package,
+		"signType":  signType,
 	}
 
-	j, _ := json.Marshal(payParams)
+	var sign string
 
-	return request.Result(j), nil
+	if signType == "HMAC-SHA256" {
+		sign = c.SignWithHmacSha256(payParams)
+	} else {
+		sign = c.SignWithMd5(payParams)
+	}
+
+	payParams["paySign"] = sign
+
+	return &PayParams{
+		Appid:     appid,
+		NonceStr:  nonce,
+		Timestamp: timestamp,
+		Package:   _package,
+		SignType:  signType,
+		PaySign:   sign,
+	}, nil
 }
 
 // BuildParams: build params with sign

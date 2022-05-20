@@ -37,6 +37,11 @@ func (r Result) GetString(key string) string {
 	return r.Parsed().Get(key).String()
 }
 
+// GetInt: get item with int64 format
+func (r Result) GetInt(key string) int64 {
+	return r.Parsed().Get(key).Int()
+}
+
 // SaveAsFile: save as file
 func (r Result) SaveAsFile(filename string) error {
 	f, err := os.Create(filename)
