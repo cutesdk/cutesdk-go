@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/idoubi/cutesdk v0.0.0-20210214072140-5bfd8344bb31
-	github.com/idoubi/goutils v1.0.4
+	github.com/idoubi/goutils v1.0.5
 	github.com/idoubi/goz v1.2.2
 	github.com/tidwall/gjson v1.14.1
 	github.com/tidwall/sjson v1.2.4
@@ -24,5 +24,5 @@ require (
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/liyaojian/cache v0.0.0-20220121124504-b978a1a38253
-	golang.org/x/net v0.0.0-20220517181318-183a9ca12b87 // indirect
+	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
 )

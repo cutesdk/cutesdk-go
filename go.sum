@@ -38,8 +38,9 @@ github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:
 github.com/idoubi/cutesdk v0.0.0-20210214072140-5bfd8344bb31 h1:sj1dVELNSGttD4imkzZIChREK/q6ecN0a9nLSLmJk3c=
 github.com/idoubi/cutesdk v0.0.0-20210214072140-5bfd8344bb31/go.mod h1:L/zHw/v2LrPPjiONSSazxaNClprWK1p05fZfM1Mw+Og=
 github.com/idoubi/goutils v1.0.0/go.mod h1:Am6ly7R/sn6GUzowyG/CnnTCHOAO7/iHzhGWzIOZoOQ=
-github.com/idoubi/goutils v1.0.4 h1:HYaT5yrtqcQ7i3sA4J0M1HLw2kQudOjhbCssAAym3Os=
 github.com/idoubi/goutils v1.0.4/go.mod h1:h89DYbCHEpDqEPFz76+jJsG9f9xnKSBrg+QDqwW6jUc=
+github.com/idoubi/goutils v1.0.5 h1:s+rWYDwFX0D3GDABXD0y30sSnBA7dcczoU6b8ZEnq5w=
+github.com/idoubi/goutils v1.0.5/go.mod h1:h89DYbCHEpDqEPFz76+jJsG9f9xnKSBrg+QDqwW6jUc=
 github.com/idoubi/goz v1.2.0/go.mod h1:mecoo+7w/U83+RSg/0VLTnYIUwOZ3PloZxrD6Oggxyw=
 github.com/idoubi/goz v1.2.2 h1:6o/EJ572VZ6iYrqUodPDTXxrCrHqAJw8ouzCU4N9veo=
 github.com/idoubi/goz v1.2.2/go.mod h1:w/6bwRG1ZTg6xPiQz1dzoLKj7sLbCTdZCrRUzbddy6E=
@@ -97,8 +98,9 @@ golang.org/x/net v0.0.0-20200520004742-59133d7f0dd7/go.mod h1:qpuaurCH72eLCgpAm/
 golang.org/x/net v0.0.0-20201021035429-f5854403a974/go.mod h1:sp8m0HH+o8qH0wwXwYZr8TS3Oi6o0r6Gce1SSxlDquU=
 golang.org/x/net v0.0.0-20210119194325-5f4716e94777/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/net v0.0.0-20210428140749-89ef3d95e781/go.mod h1:OJAsFXCWl8Ukc7SiCT/9KSuxbyM7479/AVlXFRxuMCk=
-golang.org/x/net v0.0.0-20220517181318-183a9ca12b87 h1:cCR+9mKLOGyX4Zx+uBZDXEDAQsvKQ/XbW4vreG5v1jU=
 golang.org/x/net v0.0.0-20220517181318-183a9ca12b87/go.mod h1:CfG3xpIq0wQ8r1q4Su4UZFWDARRcnwPjda9FqA0JpMk=
+golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 h1:NWy5+hlRbC7HK+PmcXVUmW1IMyFce7to56IUvhUFm7Y=
+golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2/go.mod h1:CfG3xpIq0wQ8r1q4Su4UZFWDARRcnwPjda9FqA0JpMk=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=

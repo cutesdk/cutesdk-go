@@ -16,28 +16,3 @@ type Options struct {
 	ApiKey    string
 	NotifyUrl string
 }
-
-// GetRequestClient: get request handler
-func (c *Client) GetRequestClient() *request.Client {
-	return c.requestClient
-}
-
-// GetMchId: get mch_id
-func (c *Client) GetMchId() string {
-	return c.opts.MchId
-}
-
-// GetAppid: get appid
-func (c *Client) GetAppid() string {
-	return c.opts.Appid
-}
-
-// GetApiKey: get api_key
-func (c *Client) GetApiKey() string {
-	return c.opts.ApiKey
-}
-
-// GetNotifyUrl: get notify_url
-func (c *Client) GetNotifyUrl() string {
-	return c.opts.NotifyUrl
-}
