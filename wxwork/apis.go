@@ -7,8 +7,8 @@ func (c *Client) FetchAccessToken() (request.Result, error) {
 	uri := "/cgi-bin/gettoken"
 
 	res, err := c.Get(uri, map[string]interface{}{
-		"corpid":     c.GetCorpid(),
-		"corpsecret": c.GetSecret(),
+		"corpid":     c.opts.Corpid,
+		"corpsecret": c.opts.Secret,
 	})
 
 	return res, err

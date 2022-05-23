@@ -7,10 +7,10 @@ import (
 
 // DecryptUserInfo: decrypt userinfo
 func (c *Client) DecryptUserInfo(sessionKey, encryptedData, iv string) (request.Result, error) {
-	return crypt.DecryptData(sessionKey, encryptedData, iv)
+	return crypt.DecryptWithSessionKey(sessionKey, encryptedData, iv)
 }
 
 // DecryptPhone: decrypt user phone
 func (c *Client) DecryptPhone(sessionKey, encryptedData, iv string) (request.Result, error) {
-	return crypt.DecryptData(sessionKey, encryptedData, iv)
+	return crypt.DecryptWithSessionKey(sessionKey, encryptedData, iv)
 }

@@ -55,7 +55,7 @@ func NewClient(opts *Options) (*Client, error) {
 	c.requestClient = request.NewClient(opts.Request)
 
 	// set default access_token cache key
-	accessTokenCacheKey := fmt.Sprintf("wxwork.access_token.%s.%s", c.GetCorpid(), c.GetAgentid())
+	accessTokenCacheKey := fmt.Sprintf("wxwork.access_token.%s.%s", c.opts.Corpid, c.opts.Agentid)
 	c.SetAccessTokenCacheKey(accessTokenCacheKey)
 
 	// set default access_token handler
@@ -79,6 +79,11 @@ func (c *Client) SetAccessToken(token string, expire time.Duration) error {
 	return c.GetAccessTokenHandler().SetToken(token, expire)
 }
 
+// GetOptions: get options
+func (c *Client) GetOptions() *Options {
+	return c.opts
+}
+
 // Get: request api with get method
 func (c *Client) Get(uri string, args ...map[string]interface{}) (request.Result, error) {
 	return c.GetRequestClient().Get(uri, args...)
@@ -92,4 +97,45 @@ func (c *Client) Post(uri string, args ...map[string]interface{}) (request.Resul
 // Request: request api
 func (c *Client) Request(method, uri string, opts goz.Options) (request.Result, error) {
 	return c.GetRequestClient().Request(method, uri, opts)
+}
+
+// GetRequestClient: get request handler
+func (c *Client) GetRequestClient() *request.Client {
+	return c.requestClient
+}
+
+// GetCacheHandler: get cache handler
+func (c *Client) GetCacheHandler() cache.ICache {
+	return c.cacheHandler
+}
+
+// SetCacheHandler: set cache handler
+func (c *Client) SetCacheHandler(handler cache.ICache) error {
+	c.cacheHandler = handler
+
+	return nil
+}
+
+// GetAccessTokenCacheKey: get access_token cache key
+func (c *Client) GetAccessTokenCacheKey() string {
+	return c.accessTokenCacheKey
+}
+
+// SetAccessTokenCacheKey: set access_token cache key
+func (c *Client) SetAccessTokenCacheKey(cacheKey string) error {
+	c.accessTokenCacheKey = cacheKey
+
+	return nil
+}
+
+// GetAccessTokenHandler: get access_token handler
+func (c *Client) GetAccessTokenHandler() token.IToken {
+	return c.accessTokenHandler
+}
+
+// SetAccessTokenHandler: set access_token handler
+func (c *Client) SetAccessTokenHandler(handler token.IToken) error {
+	c.accessTokenHandler = handler
+
+	return nil
 }
