@@ -2,16 +2,12 @@ package tests
 
 import (
 	"testing"
-	"time"
 )
 
-func TestSetComponentVerifyTicket(t *testing.T) {
-	c := getClient()
+func TestFetchComponentAccessToken(t *testing.T) {
+	ins := getIns()
 
-	ticket := "ticket@@@BDJg_t76rRbAT-riW9cfI04C0v4eUR93de82xXAPf3abXgfCim4u8tMIRZY35v8iK20LGhiVvBqA9d9AjqAZgA"
-	expire := 720 * time.Minute
+	res, err := ins.FetchComponentAccessToken()
 
-	err := c.SetComponentVerifyTicket(ticket, expire)
-
-	t.Error(err)
+	t.Error(res, err)
 }

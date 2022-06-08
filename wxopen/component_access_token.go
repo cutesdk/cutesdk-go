@@ -7,19 +7,19 @@ import (
 
 // ComponentAccessToken: default component_access_token handler
 type ComponentAccessToken struct {
-	client *Client
+	ins *Instance
 }
 
 // NewComponentAccessToken: init component_access_token handler
-func NewComponentAccessToken(c *Client) *ComponentAccessToken {
-	return &ComponentAccessToken{c}
+func NewComponentAccessToken(ins *Instance) *ComponentAccessToken {
+	return &ComponentAccessToken{ins}
 }
 
 // GetToken: get component_access_token, from cache or api
 func (t *ComponentAccessToken) GetToken() (string, error) {
-	cacheKey := t.client.GetComponentAccessTokenCacheKey()
+	cacheKey := t.ins.GetComponentAccessTokenCacheKey()
 
-	cache := t.client.GetCacheHandler()
+	cache := t.ins.GetCacheHandler()
 
 	// get component_access_token from cache
 	if v, err := cache.Get(cacheKey); err == nil && v != nil {
@@ -34,12 +34,12 @@ func (t *ComponentAccessToken) GetToken() (string, error) {
 
 // RefreshToken: refresh component_access_token
 func (t *ComponentAccessToken) RefreshToken() (string, error) {
-	cacheKey := t.client.GetComponentAccessTokenCacheKey()
+	cacheKey := t.ins.GetComponentAccessTokenCacheKey()
 
-	cache := t.client.GetCacheHandler()
+	cache := t.ins.GetCacheHandler()
 
 	// get component_access_token from api
-	res, err := t.client.FetchComponentAccessToken()
+	res, err := t.ins.FetchComponentAccessToken()
 	if err != nil {
 		return "", fmt.Errorf("fetch token failed: %v", err)
 	}
@@ -60,9 +60,9 @@ func (t *ComponentAccessToken) RefreshToken() (string, error) {
 
 // SetToken: set component_access_token to cache
 func (t *ComponentAccessToken) SetToken(token string, expire time.Duration) error {
-	cacheKey := t.client.GetComponentAccessTokenCacheKey()
+	cacheKey := t.ins.GetComponentAccessTokenCacheKey()
 
-	cache := t.client.GetCacheHandler()
+	cache := t.ins.GetCacheHandler()
 
 	// set component_access_token to cache
 	return cache.Set(cacheKey, token, expire)

@@ -85,7 +85,7 @@ func (s *Server) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
 
 	notifyMsg := &NotifyMsg{
 		raw: reqBody,
-		res: request.Result(reqBody).XmlParsed(),
+		res: request.NewResult(reqBody).XmlParsed(),
 	}
 
 	return notifyMsg, err

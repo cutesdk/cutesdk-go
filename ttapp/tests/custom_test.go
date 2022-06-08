@@ -22,13 +22,13 @@ func TestSetFileCache(t *testing.T) {
 			},
 		},
 	}
-	client, err := ttapp.NewClient(opts)
+	ins, err := ttapp.New(opts)
 
 	if err != nil {
 		t.Fatalf("new client error: %v", err)
 	}
 
-	res, err := client.GetAccessToken()
+	res, err := ins.GetAccessToken()
 	t.Error(res, err)
 }
 
@@ -44,13 +44,13 @@ func TestSetRedisCache(t *testing.T) {
 			},
 		},
 	}
-	client, err := ttapp.NewClient(opts)
+	ins, err := ttapp.New(opts)
 
 	if err != nil {
 		t.Fatalf("new client error: %v", err)
 	}
 
-	res, err := client.GetAccessToken()
+	res, err := ins.GetAccessToken()
 
 	t.Error(res, err)
 }
@@ -67,7 +67,7 @@ func TestSetAccessTokenCacheKey(t *testing.T) {
 			},
 		},
 	}
-	client, err := ttapp.NewClient(opts)
+	ins, err := ttapp.New(opts)
 
 	if err != nil {
 		t.Fatalf("new client error: %v", err)
@@ -77,43 +77,43 @@ func TestSetAccessTokenCacheKey(t *testing.T) {
 		GrantType string `json:"grant_type"`
 		Appid     string `json:"appid"`
 		Secret    string `json:"secret"`
-	}{"client_credential", client.GetAppid(), client.GetSecret()}
+	}{"client_credential", ins.GetAppid(), ins.GetSecret()}
 
 	jsonByte, _ := json.Marshal(keyFields)
 
 	cacheKey := fmt.Sprintf("easywechat.kernel.access_token.%s", goutils.MD5(string(jsonByte)))
 
-	client.SetAccessTokenCacheKey(cacheKey)
+	ins.SetAccessTokenCacheKey(cacheKey)
 
-	res, err := client.GetAccessToken()
+	res, err := ins.GetAccessToken()
 
 	t.Error(res, err)
 }
 
 func TestSetAccessTokenHandler(t *testing.T) {
-	client := getClient()
+	ins := getIns()
 
-	handler := newCustomAccessTokenHandler(client)
+	handler := newCustomAccessTokenHandler(ins)
 
-	client.SetAccessTokenHandler(handler)
+	ins.SetAccessTokenHandler(handler)
 
-	res, err := client.GetAccessToken()
+	res, err := ins.GetAccessToken()
 
 	t.Error(res, err)
 }
 
 type customAccessTokenHandler struct {
-	client *ttapp.Client
+	ins *ttapp.Instance
 }
 
-func newCustomAccessTokenHandler(client *ttapp.Client) *customAccessTokenHandler {
-	return &customAccessTokenHandler{client}
+func newCustomAccessTokenHandler(ins *ttapp.Instance) *customAccessTokenHandler {
+	return &customAccessTokenHandler{ins}
 }
 
 func (c *customAccessTokenHandler) GetToken() (string, error) {
-	cacheKey := c.client.GetAccessTokenCacheKey() + "custom"
+	cacheKey := c.ins.GetAccessTokenCacheKey() + "custom"
 
-	cache := c.client.GetCacheHandler()
+	cache := c.ins.GetCacheHandler()
 
 	// get access_token from cache
 	if v, err := cache.Get(cacheKey); err == nil && v != nil {
@@ -124,9 +124,9 @@ func (c *customAccessTokenHandler) GetToken() (string, error) {
 }
 
 func (c *customAccessTokenHandler) RefreshToken() (string, error) {
-	cacheKey := c.client.GetAccessTokenCacheKey() + "custom"
+	cacheKey := c.ins.GetAccessTokenCacheKey() + "custom"
 
-	cache := c.client.GetCacheHandler()
+	cache := c.ins.GetCacheHandler()
 
 	// get access_token from cache
 	if v, err := cache.Get(cacheKey); err == nil && v != nil {
@@ -134,7 +134,7 @@ func (c *customAccessTokenHandler) RefreshToken() (string, error) {
 	}
 
 	// get access_token from api
-	res, err := c.client.FetchAccessToken()
+	res, err := c.ins.FetchAccessToken()
 
 	if err != nil || res.Get("data.access_token").String() == "" {
 		return "", fmt.Errorf("fetch access_token failed: %v, %v", res, err)
@@ -147,9 +147,9 @@ func (c *customAccessTokenHandler) RefreshToken() (string, error) {
 }
 
 func (c *customAccessTokenHandler) SetToken(token string, expire time.Duration) error {
-	cacheKey := c.client.GetAccessTokenCacheKey() + "custom"
+	cacheKey := c.ins.GetAccessTokenCacheKey() + "custom"
 
-	cache := c.client.GetCacheHandler()
+	cache := c.ins.GetCacheHandler()
 
 	// set access_token to cache
 	return cache.Set(cacheKey, token, expire)

@@ -2,104 +2,110 @@ package wxopen
 
 import (
 	"bytes"
-	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
+	"github.com/cutesdk/cutesdk-go/common/crypt"
 	"github.com/cutesdk/cutesdk-go/common/request"
 )
 
-// NotifyInfo: notify info data
-type NotifyInfo struct {
-	Appid                 string `xml:"AppId"`
-	CreateTime            string `xml:"CreateTime"`
-	InfoType              string `xml:"InfoType"`
-	ComponentVerifyTicket string `xml:"ComponentVerifyTicket,omitempty"`
-}
-
-// NotifyMsg: notify msg
+// NotifyMsg: notify message type
 type NotifyMsg struct {
-	ToUserName   string `xml:"ToUserName"`
-	FromUserName string `xml:"FromUserName"`
-	CreateTime   string `xml:"CreateTime"`
-	MsgType      string `xml:"MsgType"`
-	Content      string `xml:"Content,omitempty"`
-	MsgId        string `xml:"MsgId"`
+	*request.Result
+	receiveId string
 }
 
-// NotifyData: notify data
-type NotifyData struct {
-	Appid      string `xml:"AppId,omitempty"`
-	ToUserName string `xml:"ToUserName,omitempty"`
-	Encrypt    string `xml:"Encrypt"`
+// ReceiveId: get receiveId
+func (n *NotifyMsg) ReceiveId() string {
+	return n.receiveId
 }
 
-// GetNotifyInfo: get notify info
-func (s *Server) GetNotifyInfo(req *http.Request) (*NotifyInfo, error) {
-	res, err := s.GetRawMessage(req)
+// NotifyHandler: notify handler
+type NotifyHandler func(*NotifyMsg) *ReplyMsg
+
+// Listen: listen notify
+func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
+	msg, err := ins.GetNotifyMsg(req)
 	if err != nil {
-		return nil, fmt.Errorf("get notify data failed: %v", err)
+		return fmt.Errorf("get notify message failed: %v", err)
 	}
 
-	notifyInfo := &NotifyInfo{}
-	if err := xml.Unmarshal(res, &notifyInfo); err != nil {
-		return nil, err
+	if notifyHandler == nil {
+		return nil
 	}
 
-	return notifyInfo, nil
+	replyMsg := notifyHandler(msg)
+
+	if replyMsg == nil {
+		return ins.ReplySuccess(resp)
+	}
+
+	return ins.ReplySuccess(resp)
 }
 
-// GetMessage: get notify message
-func (s *Server) GetMessage(req *http.Request) (*NotifyMsg, error) {
-	res, err := s.GetRawMessage(req)
-	if err != nil {
-		return nil, fmt.Errorf("get notify data failed: %v", err)
-	}
-
-	notifyMsg := &NotifyMsg{}
-	if err := xml.Unmarshal(res, &notifyMsg); err != nil {
-		return nil, err
-	}
-
-	return notifyMsg, nil
-}
-
-// GetRawMessage: get notify data
-func (s *Server) GetRawMessage(req *http.Request) (request.Result, error) {
-	queryParams := req.URL.Query()
-	timestamp := queryParams.Get("timestamp")
-	nonce := queryParams.Get("nonce")
-	msgSignature := queryParams.Get("msg_signature")
-
-	if timestamp == "" || nonce == "" || msgSignature == "" {
-		return nil, fmt.Errorf("invalid notify params")
-	}
-
+// GetReqBody: get request data in body
+func (ins *Instance) GetReqBody(req *http.Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return nil, fmt.Errorf("invalid notify data: %v", err)
 	}
 	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
-	notifyData := &NotifyData{}
-	err = xml.Unmarshal(body, &notifyData)
-	if err != nil || notifyData.Encrypt == "" {
-		return nil, fmt.Errorf("notify data unmarshal failed")
+	return body, nil
+}
+
+// VerifyNotifyMsg: verify notify message
+func (ins *Instance) VerifyNotifyMsg(req *http.Request, msgEncrypt string) error {
+	params := req.URL.Query()
+
+	timestamp := params.Get("timestamp")
+	nonce := params.Get("nonce")
+	msgSignature := params.Get("msg_signature")
+
+	calSign := crypt.GenMsgSignature(ins.opts.VerifyToken, timestamp, nonce, msgEncrypt)
+	if calSign != msgSignature {
+		return fmt.Errorf("invalid signature")
 	}
 
-	if notifyData.Appid != "" && notifyData.Appid != s.GetComponentAppid() {
-		return nil, fmt.Errorf("notify data with invalid appid")
-	}
+	return nil
+}
 
-	if err := s.VerifyMsg(timestamp, nonce, msgSignature, notifyData.Encrypt); err != nil {
-		return nil, fmt.Errorf("notify data verify failed: %v", err)
-	}
-
-	res, err := s.DecryptMsg(notifyData.Encrypt)
+// GetNotifyMsg: get notify message
+func (ins *Instance) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
+	reqBody, err := ins.GetReqBody(req)
 	if err != nil {
-		return nil, fmt.Errorf("notify data decrypt failed: %v", err)
+		return nil, err
 	}
 
-	return request.Result(res), err
+	msg := request.NewResult(reqBody)
+	msg.XmlParsed()
+
+	msgEncrypt := msg.GetString("Encrypt")
+	if msgEncrypt == "" {
+		return nil, fmt.Errorf("invalid msg_encrypt")
+	}
+
+	// verify notify message
+	if err := ins.VerifyNotifyMsg(req, msgEncrypt); err != nil {
+		return nil, fmt.Errorf("verify notify msg failed: %v", err)
+	}
+
+	fmt.Printf("%s,%s", ins.opts.aesKey, msgEncrypt)
+
+	// decrypt message
+	contentB, receiveId, err := crypt.DecryptWithAesKey(ins.opts.aesKey, msgEncrypt)
+	if err != nil {
+		return nil, fmt.Errorf("decrypt message failed: %v", err)
+	}
+
+	res := request.NewResult(contentB)
+	res.XmlParsed()
+
+	notifyMsg := &NotifyMsg{
+		res,
+		receiveId,
+	}
+
+	return notifyMsg, err
 }

@@ -8,7 +8,7 @@ import (
 )
 
 // GetOauthUrl: get oauth url
-func (c *Client) GetOauthUrl(redirectUri, scope, state string) (*url.URL, error) {
+func (ins *Instance) GetOauthUrl(redirectUri, scope, state string) (*url.URL, error) {
 	if redirectUri == "" {
 		return nil, fmt.Errorf("invalid redirectUri")
 	}
@@ -19,25 +19,25 @@ func (c *Client) GetOauthUrl(redirectUri, scope, state string) (*url.URL, error)
 	oauthBaseUri := "https://open.weixin.qq.com/connect/oauth2/authorize"
 	redirectUri = url.QueryEscape(redirectUri)
 
-	oauthUrl := fmt.Sprintf("%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect", oauthBaseUri, c.GetAppid(), redirectUri, state)
+	oauthUrl := fmt.Sprintf("%s?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s#wechat_redirect", oauthBaseUri, ins.GetAppid(), redirectUri, state)
 
 	return url.Parse(oauthUrl)
 }
 
 // GetOauthToken: get oauth access_token
-func (c *Client) GetOauthToken(code string) (request.Result, error) {
-	uri := fmt.Sprintf("/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", c.GetAppid(), c.GetSecret(), code)
+func (ins *Instance) GetOauthToken(code string) (*request.Result, error) {
+	uri := fmt.Sprintf("/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", ins.GetAppid(), ins.GetSecret(), code)
 
-	res, err := c.Get(uri)
+	res, err := ins.Get(uri)
 
 	return res, err
 }
 
 // GetOauthUser: get oauth userinfo
-func (c *Client) GetOauthUser(oauthAccessToken, openid string) (request.Result, error) {
+func (ins *Instance) GetOauthUser(oauthAccessToken, openid string) (*request.Result, error) {
 	uri := fmt.Sprintf("/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN", oauthAccessToken, openid)
 
-	res, err := c.Get(uri)
+	res, err := ins.Get(uri)
 
 	return res, err
 }

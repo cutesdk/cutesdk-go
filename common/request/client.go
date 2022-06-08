@@ -15,7 +15,7 @@ func NewClient(opts *Options) *Client {
 }
 
 // Get: make api request with get method
-func (c *Client) Get(uri string, args ...map[string]interface{}) (Result, error) {
+func (c *Client) Get(uri string, args ...map[string]interface{}) (*Result, error) {
 	params := map[string]interface{}{}
 	headers := map[string]interface{}{}
 
@@ -39,7 +39,7 @@ func (c *Client) Get(uri string, args ...map[string]interface{}) (Result, error)
 }
 
 // Post: make api request with post method
-func (c *Client) Post(uri string, args ...map[string]interface{}) (Result, error) {
+func (c *Client) Post(uri string, args ...map[string]interface{}) (*Result, error) {
 	data := map[string]interface{}{}
 	headers := map[string]interface{}{}
 
@@ -63,7 +63,7 @@ func (c *Client) Post(uri string, args ...map[string]interface{}) (Result, error
 }
 
 // PostXml: make api request with post method and xml data
-func (c *Client) PostXml(uri string, args ...map[string]interface{}) (Result, error) {
+func (c *Client) PostXml(uri string, args ...map[string]interface{}) (*Result, error) {
 	data := map[string]interface{}{}
 	headers := map[string]interface{}{}
 
@@ -87,7 +87,7 @@ func (c *Client) PostXml(uri string, args ...map[string]interface{}) (Result, er
 }
 
 // Request: make api request
-func (c *Client) Request(method string, uri string, opts goz.Options) (Result, error) {
+func (c *Client) Request(method string, uri string, opts goz.Options) (*Result, error) {
 	cli := goz.NewClient()
 
 	apiUrl := c.opts.BaseUri + uri
@@ -100,5 +100,9 @@ func (c *Client) Request(method string, uri string, opts goz.Options) (Result, e
 
 	body, err := resp.GetBody()
 
-	return Result(body), err
+	if err != nil {
+		return nil, err
+	}
+
+	return NewResult(body), err
 }

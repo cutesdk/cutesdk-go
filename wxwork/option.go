@@ -7,6 +7,7 @@ import (
 
 // Options: custom options
 type Options struct {
+	Debug          bool
 	Request        *request.Options
 	Cache          *cache.Options
 	Corpid         string

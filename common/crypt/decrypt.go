@@ -9,7 +9,7 @@ import (
 )
 
 // DecryptWithSessionKey: decrypt data
-func DecryptWithSessionKey(sessionKey, encryptedData, iv string) (request.Result, error) {
+func DecryptWithSessionKey(sessionKey, encryptedData, iv string) (*request.Result, error) {
 	src, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func DecryptWithSessionKey(sessionKey, encryptedData, iv string) (request.Result
 		return nil, err
 	}
 
-	return request.Result(decryptedData), nil
+	return request.NewResult(decryptedData), nil
 }
 
 // DecryptWithAesKey: decrypt with aesKey

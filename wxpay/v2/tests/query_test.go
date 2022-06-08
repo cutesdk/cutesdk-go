@@ -3,11 +3,15 @@ package tests
 import "testing"
 
 func TestQueryOrderByOutTradeNo(t *testing.T) {
-	client := getClient()
+	ins := getPayIns()
 
-	outTradeNo := "202205181652863740781065"
+	uri := "/pay/orderquery"
 
-	res, err := client.QueryOrderByOutTradeNo(outTradeNo)
+	params := map[string]interface{}{
+		"out_trade_no": "202206081654686515800896",
+	}
 
-	t.Error(res, err)
+	res, err := ins.Post(uri, params)
+
+	t.Error(res.GetString("trade_state"), err)
 }

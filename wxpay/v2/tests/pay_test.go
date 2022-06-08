@@ -3,11 +3,27 @@ package tests
 import (
 	"testing"
 
+	"github.com/cutesdk/cutesdk-go/wxpay/v2"
 	"github.com/idoubi/goutils"
 )
 
+func getPayIns() *wxpay.Instance {
+	opts := &wxpay.Options{
+		MchId:  "1498014222",
+		Appid:  "wx25da2eca8fa3f4ef",
+		ApiKey: "Q5xQzBMvdvKQgn3Li3e26XVb4TNYuS13",
+		Debug:  true,
+	}
+
+	ins, _ := wxpay.New(opts)
+
+	return ins
+}
+
 func TestUnifiedOrder(t *testing.T) {
-	client := getClient()
+	ins := getPayIns()
+
+	uri := "/pay/unifiedorder"
 
 	params := map[string]interface{}{
 		"body":             "支付测试",
@@ -21,20 +37,20 @@ func TestUnifiedOrder(t *testing.T) {
 		"sign_type":        "HMAC-SHA256",
 	}
 
-	res, err := client.UnifiedOrder(params)
-	x := res.XmlParsed()
-	t.Error(x.Get("prepay_id").String(), err)
+	res, err := ins.Post(uri, params)
+
+	t.Error(res.GetString("prepay_id"), err)
 }
 
 func TestGetPayParams(t *testing.T) {
-	client := getClient()
+	ins := getPayIns()
 
 	params := map[string]interface{}{
 		"prepay_id": "wx181643135445953d9d84c82e51f2160000",
 		"sign_type": "HMAC-SHA256",
 	}
 
-	res, err := client.GetPayParams(params)
+	res, err := ins.GetPayParams(params)
 
 	t.Error(res, err)
 }

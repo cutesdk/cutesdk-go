@@ -6,6 +6,6 @@ import (
 )
 
 // DecryptUserInfo: decrypt userinfo
-func (c *Client) DecryptUserInfo(sessionKey, encryptedData, iv string) (request.Result, error) {
+func (ins *Instance) DecryptUserInfo(sessionKey, encryptedData, iv string) (*request.Result, error) {
 	return crypt.DecryptWithSessionKey(sessionKey, encryptedData, iv)
 }

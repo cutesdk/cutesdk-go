@@ -1,23 +1,45 @@
 package tests
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestGetUserList(t *testing.T) {
-	client := getClient()
+	ins := getIns()
 
-	nextOpenid := ""
+	accessToken, err := ins.GetAccessToken()
+	if err != nil {
+		t.Fatalf("get access_token failed: %v", err)
+	}
 
-	res, err := client.GetUserList(nextOpenid)
+	uri := fmt.Sprintf("/cgi-bin/user/get?access_token=%s", accessToken)
 
-	t.Error(res, err)
+	params := map[string]interface{}{
+		"next_openid": "",
+	}
+
+	res, err := ins.Get(uri, params)
+
+	t.Error(res.GetInt("total"), err)
 }
 
 func TestGetUserInfo(t *testing.T) {
-	client := getClient()
+	ins := getIns()
 
-	openid := "orNyi07T5GeE2nwVV7b1dJ3xGnPM"
+	accessToken, err := ins.GetAccessToken()
+	if err != nil {
+		t.Fatalf("get access_token failed: %v", err)
+	}
 
-	res, err := client.GetUserInfo(openid)
+	uri := fmt.Sprintf("/cgi-bin/user/info?access_token=%s", accessToken)
 
-	t.Error(res, err)
+	params := map[string]interface{}{
+		"openid": "orNyi07T5GeE2nwVV7b1dJ3xGnPM",
+		"lang":   "zh_CN",
+	}
+
+	res, err := ins.Get(uri, params)
+
+	t.Error(res.GetString("openid"), err)
 }
