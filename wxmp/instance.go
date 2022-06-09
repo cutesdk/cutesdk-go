@@ -7,6 +7,7 @@ import (
 	"github.com/cutesdk/cutesdk-go/common/cache"
 	"github.com/cutesdk/cutesdk-go/common/request"
 	"github.com/cutesdk/cutesdk-go/common/token"
+	"github.com/idoubi/goutils/crypt"
 	"github.com/idoubi/goz"
 )
 
@@ -42,6 +43,11 @@ func New(opts *Options) (*Instance, error) {
 		opts.Cache.Driver = "file"
 		opts.Cache.Conf = map[string]interface{}{
 			"dir": "./cache",
+		}
+	}
+	if opts.EncodingAesKey != "" {
+		if v, _ := crypt.Base64Decode(opts.EncodingAesKey + "="); v != nil {
+			opts.aesKey = v
 		}
 	}
 

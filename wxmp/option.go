@@ -7,9 +7,12 @@ import (
 
 // Options: custom options
 type Options struct {
-	Debug   bool
-	Request *request.Options
-	Cache   *cache.Options
-	Appid   string
-	Secret  string
+	Debug          bool
+	Request        *request.Options
+	Cache          *cache.Options
+	Appid          string
+	Secret         string
+	VerifyToken    string
+	EncodingAesKey string // 43 bit
+	aesKey         []byte // 32 bit
 }
