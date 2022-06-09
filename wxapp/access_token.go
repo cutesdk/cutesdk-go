@@ -11,8 +11,8 @@ type AccessToken struct {
 }
 
 // NewAccessToken: init access_token handler
-func NewAccessToken(c *Instance) *AccessToken {
-	return &AccessToken{c}
+func NewAccessToken(ins *Instance) *AccessToken {
+	return &AccessToken{ins}
 }
 
 // GetToken: get access_token, from cache or api

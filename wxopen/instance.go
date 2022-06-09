@@ -143,16 +143,6 @@ func (ins *Instance) SetCacheHandler(handler cache.ICache) error {
 	return nil
 }
 
-// GetComponentAppid: get component_appid
-func (ins *Instance) GetComponentAppid() string {
-	return ins.opts.ComponentAppid
-}
-
-// GetComponentAppsecret get component_appsecret
-func (ins *Instance) GetComponentAppsecret() string {
-	return ins.opts.ComponentAppsecret
-}
-
 // GetComponentAccessTokenCacheKey: get component_access_token cache key
 func (ins *Instance) GetComponentAccessTokenCacheKey() string {
 	return ins.componentAccessTokenCacheKey
@@ -199,4 +189,19 @@ func (ins *Instance) SetComponentVerifyTicketHandler(handler token.IToken) error
 	ins.componentVerifyTicketHandler = handler
 
 	return nil
+}
+
+// GetOptions: get options
+func (ins *Instance) GetOptions() *Options {
+	return ins.opts
+}
+
+// GetComponentAppid: get component_appid
+func (ins *Instance) GetComponentAppid() string {
+	return ins.opts.ComponentAppid
+}
+
+// GetComponentAppsecret get component_appsecret
+func (ins *Instance) GetComponentAppsecret() string {
+	return ins.opts.ComponentAppsecret
 }

@@ -3,11 +3,9 @@ module github.com/cutesdk/cutesdk-go
 go 1.17
 
 require (
-	github.com/idoubi/cutesdk v0.0.0-20210214072140-5bfd8344bb31
 	github.com/idoubi/goutils v1.0.5
 	github.com/idoubi/goz v1.2.2
 	github.com/tidwall/gjson v1.14.1
-	github.com/tidwall/sjson v1.2.4
 )
 
 require (

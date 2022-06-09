@@ -113,16 +113,6 @@ func (ins *Instance) SetCacheHandler(handler cache.ICache) error {
 	return nil
 }
 
-// GetAppid: get appid
-func (ins *Instance) GetAppid() string {
-	return ins.opts.Appid
-}
-
-// GetSecret: get secret
-func (ins *Instance) GetSecret() string {
-	return ins.opts.Secret
-}
-
 // GetAccessTokenCacheKey: get access_token cache key
 func (ins *Instance) GetAccessTokenCacheKey() string {
 	return ins.accessTokenCacheKey
@@ -145,4 +135,19 @@ func (ins *Instance) SetAccessTokenHandler(handler token.IToken) error {
 	ins.accessTokenHandler = handler
 
 	return nil
+}
+
+// GetOptions: get options
+func (ins *Instance) GetOptions() *Options {
+	return ins.opts
+}
+
+// GetAppid: get appid
+func (ins *Instance) GetAppid() string {
+	return ins.opts.Appid
+}
+
+// GetSecret: get secret
+func (ins *Instance) GetSecret() string {
+	return ins.opts.Secret
 }

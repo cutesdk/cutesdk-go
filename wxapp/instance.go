@@ -83,21 +83,6 @@ func (ins *Instance) SetCacheHandler(handler cache.ICache) error {
 	return nil
 }
 
-// GetOptions: get options
-func (ins *Instance) GetOptions() *Options {
-	return ins.opts
-}
-
-// GetAppid: get appid
-func (ins *Instance) GetAppid() string {
-	return ins.opts.Appid
-}
-
-// GetSecret: get secret
-func (ins *Instance) GetSecret() string {
-	return ins.opts.Secret
-}
-
 // GetAccessTokenCacheKey: get access_token cache key
 func (ins *Instance) GetAccessTokenCacheKey() string {
 	return ins.accessTokenCacheKey
@@ -150,4 +135,19 @@ func (ins *Instance) Post(uri string, args ...map[string]interface{}) (*request.
 // Request: request api
 func (ins *Instance) Request(method, uri string, opts goz.Options) (*request.Result, error) {
 	return ins.GetRequestClient().Request(method, uri, opts)
+}
+
+// GetOptions: get options
+func (ins *Instance) GetOptions() *Options {
+	return ins.opts
+}
+
+// GetAppid: get appid
+func (ins *Instance) GetAppid() string {
+	return ins.opts.Appid
+}
+
+// GetSecret: get secret
+func (ins *Instance) GetSecret() string {
+	return ins.opts.Secret
 }

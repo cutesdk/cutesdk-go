@@ -41,7 +41,7 @@ func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyH
 		return ins.ReplySuccess(resp)
 	}
 
-	return ins.ReplySuccess(resp)
+	return ins.ReplyEncryptedMsg(resp, replyMsg)
 }
 
 // GetReqBody: get request data in body
@@ -90,8 +90,6 @@ func (ins *Instance) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
 	if err := ins.VerifyNotifyMsg(req, msgEncrypt); err != nil {
 		return nil, fmt.Errorf("verify notify msg failed: %v", err)
 	}
-
-	fmt.Printf("%s,%s", ins.opts.aesKey, msgEncrypt)
 
 	// decrypt message
 	contentB, receiveId, err := crypt.DecryptWithAesKey(ins.opts.aesKey, msgEncrypt)

@@ -48,7 +48,7 @@ func (r *Result) XmlParsed() gjson.Result {
 
 // String print the result as string
 func (r *Result) String() string {
-	return string(r.raw)
+	return r.res.String()
 }
 
 // Get a sub item from the Parsed data

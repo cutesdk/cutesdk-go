@@ -14,7 +14,7 @@ func TestDecryptUserInfo(t *testing.T) {
 	res, err := ins.DecryptUserInfo(sessionKey, encryptedData, iv)
 
 	if err != nil {
-		t.Fatalf("decrypt user info error: %v\n", err)
+		t.Fatalf("decrypt user info failed: %v", err)
 	}
 
 	t.Error(res.GetString("nickName"), err)

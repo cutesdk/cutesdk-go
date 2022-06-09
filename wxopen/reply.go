@@ -2,16 +2,15 @@ package wxopen
 
 import (
 	"encoding/xml"
+	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/cutesdk/cutesdk-go/common/crypt"
+	"github.com/cutesdk/cutesdk-go/common/request"
+	"github.com/idoubi/goutils"
+	"github.com/idoubi/goutils/convert"
 )
-
-// import (
-// 	"encoding/xml"
-// 	"fmt"
-// 	"net/http"
-
-// 	"github.com/idoubi/goutils"
-// )
 
 type CDATAText string
 
@@ -21,71 +20,173 @@ func (c CDATAText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}{string(c)}, start)
 }
 
-// ReplyMsg: reply message
-type ReplyMsg struct {
+// EncryptedMsg: encrypted message
+type EncryptedMsg struct {
 	XMLName      xml.Name  `xml:"xml"`
-	ToUserName   CDATAText `xml:"ToUserName"`
-	FromUserName CDATAText `xml:"FromUserName"`
-	CreateTime   string    `xml:"CreateTime"`
-	MsgType      CDATAText `xml:"MsgType"`
-	Content      CDATAText `xml:"Content,omitempty"`
+	Encrypt      CDATAText `xml:"Encrypt"`
+	MsgSignature CDATAText `xml:"MsgSignature"`
+	TimeStamp    string    `xml:"TimeStamp"`
+	Nonce        CDATAText `xml:"Nonce"`
 }
 
-// // ReplyData: encrypted data reply to user
-// type ReplyData struct {
-// 	XMLName      xml.Name  `xml:"xml"`
-// 	Encrypt      CDATAText `xml:"Encrypt"`
-// 	MsgSignature CDATAText `xml:"MsgSignature"`
-// 	TimeStamp    string    `xml:"TimeStamp"`
-// 	Nonce        CDATAText `xml:"Nonce"`
-// }
+// ReplyMsg: raw reply message
+type ReplyMsg struct {
+	*request.Result
+}
 
-// func (s *Server) EncryptReplyMsg(msg *ReplyMsg) ([]byte, error) {
-// 	xb, err := xml.MarshalIndent(msg, " ", "  ")
-// 	if err != nil {
-// 		return nil, fmt.Errorf("format reply_msg failed: %v", err)
-// 	}
+// Reply: reply msg with map data
+func (msg *NotifyMsg) Reply(data map[string]interface{}) *ReplyMsg {
+	if data == nil {
+		return nil
+	}
 
-// 	encryptedMsg, err := s.EncryptMsg(xb)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("encrypt reply_msg failed: %v", err)
-// 	}
+	data["ToUserName"] = msg.GetString("FromUserName")
+	data["FromUserName"] = msg.GetString("ToUserName")
+	data["CreateTime"] = goutils.Timestamp()
 
-// 	timestampStr := goutils.TimestampStr()
-// 	nonce := goutils.NonceStr(16)
-// 	signature := s.GenSign(timestampStr, nonce, encryptedMsg)
+	xb, err := convert.Map2Xml(data)
+	if err != nil {
+		return nil
+	}
 
-// 	replyData := &ReplyData{
-// 		Encrypt:      CDATAText(encryptedMsg),
-// 		MsgSignature: CDATAText(signature),
-// 		TimeStamp:    timestampStr,
-// 		Nonce:        CDATAText(nonce),
-// 	}
+	xs := string(xb)
+	if strings.Contains(xs, "Articles_child") {
+		xs = strings.ReplaceAll(xs, "Articles_child", "item")
+		xb = []byte(xs)
+	}
 
-// 	rxb, err := xml.MarshalIndent(replyData, " ", "  ")
-// 	if err != nil {
-// 		return nil, fmt.Errorf("format reply data failed: %v", err)
-// 	}
+	res := request.NewResult(xb)
+	res.XmlParsed()
 
-// 	return rxb, nil
-// }
+	return &ReplyMsg{res}
+}
 
-// ReplySuccess 回复字符串success
+// ReplyText: new text reply msg
+func (msg *NotifyMsg) ReplyText(content string) *ReplyMsg {
+	if content == "" {
+		return nil
+	}
+
+	reply := map[string]interface{}{
+		"MsgType": "text",
+		"Content": content,
+	}
+
+	return msg.Reply(reply)
+}
+
+// ReplyImage: new image reply msg
+func (msg *NotifyMsg) ReplyImage(mediaId string) *ReplyMsg {
+	if mediaId == "" {
+		return nil
+	}
+
+	reply := map[string]interface{}{
+		"MsgType": "image",
+		"Image": map[string]interface{}{
+			"MediaId": mediaId,
+		},
+	}
+
+	return msg.Reply(reply)
+}
+
+// ReplyVoice: new voice reply msg
+func (msg *NotifyMsg) ReplyVoice(mediaId string) *ReplyMsg {
+	if mediaId == "" {
+		return nil
+	}
+
+	reply := map[string]interface{}{
+		"MsgType": "voice",
+		"Voice": map[string]interface{}{
+			"MediaId": mediaId,
+		},
+	}
+
+	return msg.Reply(reply)
+}
+
+// ReplyVideo: new video reply msg
+func (msg *NotifyMsg) ReplyVideo(mediaId, title, description string) *ReplyMsg {
+	if mediaId == "" {
+		return nil
+	}
+
+	reply := map[string]interface{}{
+		"MsgType": "video",
+		"Video": map[string]interface{}{
+			"MediaId":     mediaId,
+			"Title":       title,
+			"Description": description,
+		},
+	}
+
+	return msg.Reply(reply)
+}
+
+// ReplyNews: new news reply msg
+func (msg *NotifyMsg) ReplyNews(title, description, url, picUrl string) *ReplyMsg {
+	reply := map[string]interface{}{
+		"MsgType":      "news",
+		"ArticleCount": 1,
+		"Articles": []map[string]interface{}{
+			{
+				"Title":       title,
+				"Description": description,
+				"PicUrl":      picUrl,
+				"Url":         url,
+			},
+		},
+	}
+
+	return msg.Reply(reply)
+}
+
+// EncryptReplyMsg: encrypt ReplyMsg
+func (ins *Instance) EncryptReplyMsg(msg *ReplyMsg) ([]byte, error) {
+	xb := msg.Raw()
+
+	msgEncrypt, err := crypt.EncryptMsg(ins.opts.aesKey, xb, ins.opts.ComponentAppid)
+	if err != nil {
+		return nil, fmt.Errorf("encrypt reply_msg failed: %v", err)
+	}
+
+	timestamp := goutils.TimestampStr()
+	nonce := goutils.NonceStr(16)
+	msgSignature := crypt.GenMsgSignature(ins.opts.VerifyToken, timestamp, nonce, msgEncrypt)
+
+	encryptedMsg := &EncryptedMsg{
+		Encrypt:      CDATAText(msgEncrypt),
+		MsgSignature: CDATAText(msgSignature),
+		TimeStamp:    timestamp,
+		Nonce:        CDATAText(nonce),
+	}
+
+	rxb, err := xml.MarshalIndent(encryptedMsg, " ", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("format encrypted msg failed: %v", err)
+	}
+
+	return rxb, nil
+}
+
+// ReplyEncryptedMsg: reply encrypted msg
+func (ins *Instance) ReplyEncryptedMsg(resp http.ResponseWriter, msg *ReplyMsg) error {
+	encryptedMsg, err := ins.EncryptReplyMsg(msg)
+	if err != nil {
+		return err
+	}
+
+	resp.Header().Set("Content-Type", "text/xml")
+	_, err = resp.Write(encryptedMsg)
+
+	return err
+}
+
+// ReplySuccess: reply success status
 func (ins *Instance) ReplySuccess(resp http.ResponseWriter) error {
 	_, err := resp.Write([]byte("success"))
 
 	return err
 }
-
-// // ReplyMessage 回复消息
-// func (s *Server) ReplyMessage(resp http.ResponseWriter, msg *ReplyMsg) error {
-// 	reply, err := s.EncryptReplyMsg(msg)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	resp.Header().Set("Content-Type", "text/xml")
-// 	_, err = resp.Write(reply)
-
-// 	return err
-// }

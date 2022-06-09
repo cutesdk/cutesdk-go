@@ -16,7 +16,10 @@ func getIns() *ttapp.Instance {
 		Debug:  true,
 	}
 
-	ins, _ := ttapp.New(opts)
+	ins, err := ttapp.New(opts)
+	if err != nil {
+		panic(err)
+	}
 
 	return ins
 }
