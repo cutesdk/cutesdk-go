@@ -17,5 +17,7 @@ func TestGetCurrentMen(t *testing.T) {
 
 	res, err := ins.Get(uri)
 
+	res.Raw()
+
 	t.Error(res.GetArray("selfmenu_info.button"), err)
 }

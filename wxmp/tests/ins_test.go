@@ -1,6 +1,8 @@
 package tests
 
 import (
+	"log"
+
 	"github.com/cutesdk/cutesdk-go/wxmp"
 )
 
@@ -11,7 +13,11 @@ func getIns() *wxmp.Instance {
 		Debug:  true,
 	}
 
-	ins, _ := wxmp.New(opts)
+	ins, err := wxmp.New(opts)
+
+	if err != nil {
+		log.Fatalf("new wxmp sdk failed: %v", err)
+	}
 
 	return ins
 }

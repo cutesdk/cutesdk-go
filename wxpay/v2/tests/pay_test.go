@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/cutesdk/cutesdk-go/wxpay/v2"
@@ -52,5 +53,7 @@ func TestGetPayParams(t *testing.T) {
 
 	res, err := ins.GetPayParams(params)
 
-	t.Error(res, err)
+	j, _ := json.Marshal(res)
+
+	t.Error(string(j), err)
 }

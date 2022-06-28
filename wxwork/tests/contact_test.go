@@ -3,7 +3,6 @@ package tests
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/cutesdk/cutesdk-go/wxwork"
 )
@@ -18,8 +17,8 @@ func getContactIns() *wxwork.Instance {
 
 	ins, _ := wxwork.New(opts)
 
-	accessToken := `QBHr-JGerArt6tfG3hYNSpMCTS2aCFcZCXQjBPkPAPXAqkcW_tTJMKmYhaeMb3usaPEfLe1pUT5NHfIMh0gI6O6GcPlvK_xyCNYZNM2AHKH76jwdcjxoWrKSWO7gawOPkzsXUBmki0oVB5PjlKmDHoz-nNzYWbkkTpTZsD5Ii01FdDY8TdyorfE2a80kv5SiRu8-N8Z4scaN7PKD-CxE3Q`
-	ins.SetAccessToken(accessToken, 5*time.Second)
+	// accessToken := `QBHr-JGerArt6tfG3hYNSpMCTS2aCFcZCXQjBPkPAPXAqkcW_tTJMKmYhaeMb3usaPEfLe1pUT5NHfIMh0gI6O6GcPlvK_xyCNYZNM2AHKH76jwdcjxoWrKSWO7gawOPkzsXUBmki0oVB5PjlKmDHoz-nNzYWbkkTpTZsD5Ii01FdDY8TdyorfE2a80kv5SiRu8-N8Z4scaN7PKD-CxE3Q`
+	// ins.SetAccessToken(accessToken, 5*time.Second)
 
 	return ins
 }

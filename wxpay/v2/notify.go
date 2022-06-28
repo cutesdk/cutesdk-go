@@ -7,47 +7,25 @@ import (
 	"net/http"
 
 	"github.com/cutesdk/cutesdk-go/common/request"
-	"github.com/tidwall/gjson"
 )
 
 // NotifyMsg: notify message type
 type NotifyMsg struct {
-	raw []byte
-	res gjson.Result
-}
-
-// Raw: get raw data
-func (n *NotifyMsg) Raw() []byte {
-	return n.raw
-}
-
-// String: print format
-func (n *NotifyMsg) String() string {
-	return string(n.raw)
-}
-
-// GetString: get field value with string format
-func (n *NotifyMsg) GetString(key string) string {
-	return n.res.Get(key).String()
-}
-
-// GetInt: get field value with int64 format
-func (n *NotifyMsg) GetInt(key string) int64 {
-	return n.res.Get(key).Int()
+	*request.Result
 }
 
 // NotifyHandler: notify handler
 type NotifyHandler func(*NotifyMsg) *ReplyMsg
 
 // Listen: listen notify
-func (s *Server) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
-	msg, err := s.GetNotifyMsg(req)
+func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
+	msg, err := ins.GetNotifyMsg(req)
 	if err != nil {
 		return fmt.Errorf("get notify message failed: %v", err)
 	}
 
 	if msg.GetString("return_code") == "SUCCESS" {
-		if err := s.VerifyNotifyMsg(msg); err != nil {
+		if err := ins.VerifyNotifyMsg(msg); err != nil {
 			return fmt.Errorf("verify notify message failed: %v", err)
 		}
 	}
@@ -62,11 +40,11 @@ func (s *Server) Listen(req *http.Request, resp http.ResponseWriter, notifyHandl
 		return nil
 	}
 
-	return s.ReplyMessage(resp, replyMsg)
+	return ins.ReplyMessage(resp, replyMsg)
 }
 
 // GetReqBody: get request data in body
-func (s *Server) GetReqBody(req *http.Request) ([]byte, error) {
+func (ins *Instance) GetReqBody(req *http.Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return nil, fmt.Errorf("invalid notify data: %v", err)
@@ -76,23 +54,8 @@ func (s *Server) GetReqBody(req *http.Request) ([]byte, error) {
 	return body, nil
 }
 
-// GetNotifyMsg: get notify message
-func (s *Server) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
-	reqBody, err := s.GetReqBody(req)
-	if err != nil {
-		return nil, err
-	}
-
-	notifyMsg := &NotifyMsg{
-		raw: reqBody,
-		res: request.NewResult(reqBody).XmlParsed(),
-	}
-
-	return notifyMsg, err
-}
-
 // VerifyNotifyMsg: verify notify message
-func (s *Server) VerifyNotifyMsg(msg *NotifyMsg) error {
+func (ins *Instance) VerifyNotifyMsg(msg *NotifyMsg) error {
 	sign := msg.GetString("sign")
 	if sign == "" {
 		return fmt.Errorf("invalid sign")
@@ -108,21 +71,38 @@ func (s *Server) VerifyNotifyMsg(msg *NotifyMsg) error {
 	}
 
 	params := map[string]interface{}{}
-	for k, v := range msg.res.Map() {
+	for k, v := range msg.Map() {
 		params[k] = v
 	}
 
 	if signType == "MD5" {
-		if calSign := SignWithMd5(params, s.opts.ApiKey); calSign != sign {
+		if calSign := SignWithMd5(params, ins.opts.ApiKey); calSign != sign {
 			return fmt.Errorf("invalid sign")
 		}
 	}
 
 	if signType == "HMAC-SHA256" {
-		if sign != SignWithHmacSha256(params, s.opts.ApiKey) {
+		if sign != SignWithHmacSha256(params, ins.opts.ApiKey) {
 			return fmt.Errorf("invalid sign")
 		}
 	}
 
 	return nil
+}
+
+// GetNotifyMsg: get notify message
+func (ins *Instance) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
+	reqBody, err := ins.GetReqBody(req)
+	if err != nil {
+		return nil, err
+	}
+
+	res := request.NewResult(reqBody)
+	res.XmlParsed()
+
+	notifyMsg := &NotifyMsg{
+		res,
+	}
+
+	return notifyMsg, err
 }

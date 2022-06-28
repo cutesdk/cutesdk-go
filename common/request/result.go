@@ -28,6 +28,11 @@ func (r *Result) Raw() []byte {
 	return r.raw
 }
 
+// Map convert to map
+func (r *Result) Map() map[string]gjson.Result {
+	return r.res.Map()
+}
+
 // Parsed to json object
 func (r *Result) Parsed() gjson.Result {
 	res := gjson.ParseBytes(r.raw)

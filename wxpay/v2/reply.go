@@ -37,7 +37,7 @@ func (n *NotifyMsg) ReplyFail(msg string) *ReplyMsg {
 }
 
 // ReplyMessage 回复消息
-func (s *Server) ReplyMessage(resp http.ResponseWriter, msg *ReplyMsg) error {
+func (ins *Instance) ReplyMessage(resp http.ResponseWriter, msg *ReplyMsg) error {
 	reply, err := xml.Marshal(msg)
 	if err != nil {
 		return err
