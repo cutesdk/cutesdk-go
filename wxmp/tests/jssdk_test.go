@@ -8,7 +8,7 @@ import (
 func TestGetJssdkConfig(t *testing.T) {
 	ins := getIns()
 
-	url := "https://idoubi.cc?p=123"
+	url := "https://xxx.com?p=123"
 
 	res, err := ins.GetJssdkConfig(url)
 

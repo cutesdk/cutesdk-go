@@ -92,10 +92,10 @@ func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request)
 
 func getIns() *wxopen.Instance {
 	opts := &wxopen.Options{
-		ComponentAppid:     "wxf2f955ce09390e6a",
-		ComponentAppsecret: "d6e9032e5f5bcea2f96b66f2c4e1cab8",
-		VerifyToken:        "OaNCoqFftJz7YkUD",
-		EncodingAesKey:     "MNfsPhrt28W4dksbARCANqIHqLmzdbZvQH8WtGgGzHv",
+		ComponentAppid:     "xxx",
+		ComponentAppsecret: "xxx",
+		VerifyToken:        "xxx",
+		EncodingAesKey:     "xxx",
 		Debug:              true,
 	}
 

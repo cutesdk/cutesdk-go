@@ -13,7 +13,7 @@ func TestCode2Session(t *testing.T) {
 	params := map[string]interface{}{
 		"appid":      ins.GetAppid(),
 		"secret":     ins.GetSecret(),
-		"js_code":    "051kk0nl2jfTd94EqBnl2cp1IS3kk0nO",
+		"js_code":    "xxx",
 		"grant_type": "authorization_code",
 	}
 
@@ -33,7 +33,7 @@ func TestGetUserPhone(t *testing.T) {
 	uri := fmt.Sprintf("/wxa/business/getuserphonenumber?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"code": "cda802f413a0a7c9767819742a84f3fe3e7839da6661e62f39d0290a21116dce",
+		"code": "xxx",
 	}
 
 	res, err := ins.Post(uri, params)

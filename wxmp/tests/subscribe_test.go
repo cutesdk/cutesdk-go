@@ -16,12 +16,12 @@ func TestSendSubscribeMsg(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/message/subscribe/bizsend?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"touser":      "orNyi07T5GeE2nwVV7b1dJ3xGnPM",
-		"template_id": "LTA5XpzSBWQQ3YI0hOw9Ucj-U1bvZIB_Ut9kHAhNBEk",
-		"page":        "https://idoubi.cc",
+		"touser":      "xxx",
+		"template_id": "xxx-xxx",
+		"page":        "https://xxx.com",
 		"data": map[string]interface{}{
 			"thing5": map[string]interface{}{
-				"value": "idoubi",
+				"value": "xxx",
 			},
 			"thing7": map[string]interface{}{
 				"value": "content",
@@ -31,7 +31,7 @@ func TestSendSubscribeMsg(t *testing.T) {
 			},
 		},
 		"miniprogram": map[string]interface{}{
-			"appid":    "wx25da2eca8fa3f4ef",
+			"appid":    "xxx",
 			"pagepath": "pages/index/index?scene=123",
 		},
 	}

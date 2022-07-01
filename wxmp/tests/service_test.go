@@ -16,7 +16,7 @@ func TestSendServiceMsg(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/message/custom/send?access_token=%s", accessToken)
 
 	data := map[string]interface{}{
-		"touser":  "orNyi07T5GeE2nwVV7b1dJ3xGnPM",
+		"touser":  "xxx",
 		"msgtype": "text",
 		"text": map[string]interface{}{
 			"content": "hello world",

@@ -14,8 +14,8 @@ func TestSendSubscribeMsg(t *testing.T) {
 
 	uri := "/api/apps/subscribe_notification/developer/v1/notify"
 
-	tplId := "MSG5877801d55d01588355646371eaaca417d88f15682"
-	openid := "L1p8S7Bwp2kweSGr"
+	tplId := "xxx"
+	openid := "xxx"
 	data := map[string]interface{}{
 		"打卡名称": "今日打卡提醒",
 		"备注":   "快去打卡吧~",

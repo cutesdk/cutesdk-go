@@ -16,11 +16,11 @@ func TestRegisterCompanyWxapp(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/component/fastregisterweapp?action=create&component_access_token=%s", componentAccessToken)
 
 	params := map[string]interface{}{
-		"name":                 "tencent",
+		"name":                 "xxx",
 		"code":                 "123",
 		"code_type":            1,
 		"legal_persona_wechat": "123",
-		"legal_persona_name":   "candy",
+		"legal_persona_name":   "xxx",
 		"component_phone":      "1234567",
 	}
 
@@ -37,7 +37,7 @@ func TestRegisterPesonalWxapp(t *testing.T) {
 		t.Fatalf("get component_access_token failed: %v", err)
 	}
 
-	name := "idoubi"
+	name := "xxx"
 	wechat := "xxx"
 	phone := "xxx"
 

@@ -35,7 +35,7 @@ func TestGetUserInfo(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/user/info?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"openid": "orNyi07T5GeE2nwVV7b1dJ3xGnPM",
+		"openid": "xxx",
 		"lang":   "zh_CN",
 	}
 

@@ -5,7 +5,7 @@ import "testing"
 func TestGetOauthUrl(t *testing.T) {
 	ins := getIns()
 
-	redirectUri := "https://www.thinkwx.com/api/callback/"
+	redirectUri := "https://www.xxx.com/api/callback/"
 	scope := "snsapi_userinfo"
 	state := "test123"
 
@@ -17,7 +17,7 @@ func TestGetOauthUrl(t *testing.T) {
 func TestGetOauthToken(t *testing.T) {
 	ins := getIns()
 
-	code := "011kbs0006qsEN1NAn300GzQSs1kbs0F"
+	code := "xxx"
 
 	res, err := ins.GetOauthToken(code)
 
@@ -27,8 +27,8 @@ func TestGetOauthToken(t *testing.T) {
 func TestGetOauthUser(t *testing.T) {
 	ins := getIns()
 
-	oauthAccessToken := "55_6JFl_DZXckzLFiQTGJruCNRllddreizk0cNHAZByZw9K7IDgbjQSKBVFGz_wehOUHt0Ayno9eVyiOrsudZG-rA"
-	openid := "orNyi07T5GeE2nwVV7b1dJ3xGnPM"
+	oauthAccessToken := "xxx-xxx"
+	openid := "xxx"
 
 	res, err := ins.GetOauthUser(oauthAccessToken, openid)
 

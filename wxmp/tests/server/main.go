@@ -64,10 +64,11 @@ func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request)
 
 func getIns() *wxmp.Instance {
 	opts := &wxmp.Options{
-		Appid:       "wx8dcd98079e13d33f",
-		Secret:      "76f2af7b3c53826e88b0dad8eb2e3e77",
-		VerifyToken: "48c2014d6d8b7696290807f8307b40cd",
-		Debug:       true,
+		Appid:          "xxx",
+		Secret:         "xxx",
+		VerifyToken:    "xxx",
+		EncodingAesKey: "xxx",
+		Debug:          true,
 	}
 
 	ins, err := wxmp.New(opts)

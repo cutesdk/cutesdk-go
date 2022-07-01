@@ -25,6 +25,6 @@ func getIns() *ttapp.Instance {
 }
 
 func init() {
-	appid = "ttfb118dac643b1233"
-	secret = "92811c680709b5bbc442dba42bb2a681cf04acd5"
+	appid = "xxx"
+	secret = "xxx"
 }

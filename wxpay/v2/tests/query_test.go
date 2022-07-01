@@ -8,7 +8,7 @@ func TestQueryOrderByOutTradeNo(t *testing.T) {
 	uri := "/pay/orderquery"
 
 	params := map[string]interface{}{
-		"out_trade_no": "202206081654686515800896",
+		"out_trade_no": "xxx",
 	}
 
 	res, err := ins.Post(uri, params)

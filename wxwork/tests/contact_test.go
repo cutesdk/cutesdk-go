@@ -9,16 +9,13 @@ import (
 
 func getContactIns() *wxwork.Instance {
 	opts := &wxwork.Options{
-		Corpid:  "wwa3f1494ad3d3713d",
+		Corpid:  "xxx",
 		Agentid: "contact",
-		Secret:  "hz0ydrPX5ZjG_yDLyRk1xzt-tALpgYE9-sMs8Uk7MqE",
+		Secret:  "xxx",
 		Debug:   true,
 	}
 
 	ins, _ := wxwork.New(opts)
-
-	// accessToken := `QBHr-JGerArt6tfG3hYNSpMCTS2aCFcZCXQjBPkPAPXAqkcW_tTJMKmYhaeMb3usaPEfLe1pUT5NHfIMh0gI6O6GcPlvK_xyCNYZNM2AHKH76jwdcjxoWrKSWO7gawOPkzsXUBmki0oVB5PjlKmDHoz-nNzYWbkkTpTZsD5Ii01FdDY8TdyorfE2a80kv5SiRu8-N8Z4scaN7PKD-CxE3Q`
-	// ins.SetAccessToken(accessToken, 5*time.Second)
 
 	return ins
 }
