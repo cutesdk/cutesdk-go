@@ -2,6 +2,7 @@ package wxmp
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/cutesdk/cutesdk-go/common/cache"
@@ -124,6 +125,47 @@ func (ins *Instance) Post(uri string, args ...map[string]interface{}) (*request.
 // Request: request api
 func (ins *Instance) Request(method, uri string, opts goz.Options) (*request.Result, error) {
 	return ins.GetRequestClient().Request(method, uri, opts)
+}
+
+// AppendTokenToUri: append access_token to request uri
+func (ins *Instance) AppendTokenToUri(uri string) (string, error) {
+	accessToken, err := ins.GetAccessToken()
+	if err != nil {
+		return uri, fmt.Errorf("%w: %v", token.ErrGetTokenFailed, err)
+	}
+
+	u, err := url.Parse(uri)
+	if err != nil {
+		return uri, err
+	}
+
+	q := u.Query()
+	q.Add("access_token", accessToken)
+
+	u.RawQuery = q.Encode()
+	uri = u.String()
+
+	return uri, nil
+}
+
+// GetWithToken: request api with get method, auth get access_token
+func (ins *Instance) GetWithToken(uri string, args ...map[string]interface{}) (*request.Result, error) {
+	uri, err := ins.AppendTokenToUri(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	return ins.Get(uri, args...)
+}
+
+// PostWithToken: request api with post method, auto get access_token
+func (ins *Instance) PostWithToken(uri string, args ...map[string]interface{}) (*request.Result, error) {
+	uri, err := ins.AppendTokenToUri(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	return ins.Post(uri, args...)
 }
 
 // GetRequestClient: get request handler

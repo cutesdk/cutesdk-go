@@ -1,27 +1,29 @@
 package tests
 
 import (
+	"errors"
 	"fmt"
 	"testing"
+
+	"github.com/cutesdk/cutesdk-go/common/token"
 )
 
 func TestGetUserList(t *testing.T) {
 	ins := getIns()
 
-	accessToken, err := ins.GetAccessToken()
-	if err != nil {
-		t.Fatalf("get access_token failed: %v", err)
-	}
-
-	uri := fmt.Sprintf("/cgi-bin/user/get?access_token=%s", accessToken)
-
+	uri := "/cgi-bin/user/get"
 	params := map[string]interface{}{
 		"next_openid": "",
 	}
+	res, err := ins.GetWithToken(uri, params)
 
-	res, err := ins.Get(uri, params)
+	if err != nil {
+		if errors.Is(err, token.ErrGetTokenFailed) {
+			t.Fatalf("%v", err)
+		}
+	}
 
-	t.Error(res.GetInt("total"), err)
+	t.Error(res, err)
 }
 
 func TestGetUserInfo(t *testing.T) {

@@ -1,19 +1,13 @@
 package tests
 
 import (
-	"fmt"
 	"testing"
 )
 
 func TestSendSubscribeMsg(t *testing.T) {
 	ins := getIns()
 
-	accessToken, err := ins.GetAccessToken()
-	if err != nil {
-		t.Fatalf("get access_token failed: %v", err)
-	}
-
-	uri := fmt.Sprintf("/cgi-bin/message/subscribe/bizsend?access_token=%s", accessToken)
+	uri := "/cgi-bin/message/subscribe/bizsend"
 
 	params := map[string]interface{}{
 		"touser":      "xxx",
@@ -36,7 +30,7 @@ func TestSendSubscribeMsg(t *testing.T) {
 		},
 	}
 
-	res, err := ins.Post(uri, params)
+	res, err := ins.PostWithToken(uri, params)
 
 	t.Error(res.GetInt("errcode"), err)
 }
