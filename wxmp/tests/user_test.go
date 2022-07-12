@@ -15,7 +15,7 @@ func TestGetUserList(t *testing.T) {
 	params := map[string]interface{}{
 		"next_openid": "",
 	}
-	res, err := ins.GetWithToken(uri, params)
+	res, err := ins.GetWithAccessToken(uri, params)
 
 	if err != nil {
 		if errors.Is(err, token.ErrGetTokenFailed) {

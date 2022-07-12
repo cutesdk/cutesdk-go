@@ -30,7 +30,7 @@ func TestSendSubscribeMsg(t *testing.T) {
 		},
 	}
 
-	res, err := ins.PostWithToken(uri, params)
+	res, err := ins.PostWithAccessToken(uri, params)
 
 	t.Error(res.GetInt("errcode"), err)
 }

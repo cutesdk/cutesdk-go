@@ -1,8 +1,10 @@
 package tests
 
 import (
-	"fmt"
+	"errors"
 	"testing"
+
+	"github.com/cutesdk/cutesdk-go/common/token"
 )
 
 func TestCode2Session(t *testing.T) {
@@ -25,18 +27,18 @@ func TestCode2Session(t *testing.T) {
 func TestGetUserPhone(t *testing.T) {
 	ins := getIns()
 
-	accessToken, err := ins.GetAccessToken()
-	if err != nil {
-		t.Fatalf("get access_token failed: %v", err)
-	}
-
-	uri := fmt.Sprintf("/wxa/business/getuserphonenumber?access_token=%s", accessToken)
+	uri := "/wxa/business/getuserphonenumber"
 
 	params := map[string]interface{}{
 		"code": "xxx",
 	}
 
-	res, err := ins.Post(uri, params)
+	res, err := ins.PostWithAccessToken(uri, params)
 
+	if err != nil {
+		if errors.Is(err, token.ErrGetTokenFailed) {
+			t.Fatalf("%v", err)
+		}
+	}
 	t.Error(res.GetInt("errcode"), err)
 }

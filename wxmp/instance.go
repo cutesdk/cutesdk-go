@@ -127,8 +127,8 @@ func (ins *Instance) Request(method, uri string, opts goz.Options) (*request.Res
 	return ins.GetRequestClient().Request(method, uri, opts)
 }
 
-// AppendTokenToUri: append access_token to request uri
-func (ins *Instance) AppendTokenToUri(uri string) (string, error) {
+// AppendAccessTokenToUri: append access_token to request uri
+func (ins *Instance) AppendAccessTokenToUri(uri string) (string, error) {
 	accessToken, err := ins.GetAccessToken()
 	if err != nil {
 		return uri, fmt.Errorf("%w: %v", token.ErrGetTokenFailed, err)
@@ -148,9 +148,9 @@ func (ins *Instance) AppendTokenToUri(uri string) (string, error) {
 	return uri, nil
 }
 
-// GetWithToken: request api with get method, auth get access_token
-func (ins *Instance) GetWithToken(uri string, args ...map[string]interface{}) (*request.Result, error) {
-	uri, err := ins.AppendTokenToUri(uri)
+// GetWithAccessToken: request api with get method, auth get access_token
+func (ins *Instance) GetWithAccessToken(uri string, args ...map[string]interface{}) (*request.Result, error) {
+	uri, err := ins.AppendAccessTokenToUri(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -158,9 +158,9 @@ func (ins *Instance) GetWithToken(uri string, args ...map[string]interface{}) (*
 	return ins.Get(uri, args...)
 }
 
-// PostWithToken: request api with post method, auto get access_token
-func (ins *Instance) PostWithToken(uri string, args ...map[string]interface{}) (*request.Result, error) {
-	uri, err := ins.AppendTokenToUri(uri)
+// PostWithAccessToken: request api with post method, auto get access_token
+func (ins *Instance) PostWithAccessToken(uri string, args ...map[string]interface{}) (*request.Result, error) {
+	uri, err := ins.AppendAccessTokenToUri(uri)
 	if err != nil {
 		return nil, err
 	}
