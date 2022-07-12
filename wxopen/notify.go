@@ -1,155 +1,109 @@
 package wxopen
 
 import (
-	"encoding/xml"
-	"errors"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sort"
-	"strings"
 
-	"github.com/idoubi/goutils/crypt"
+	"github.com/cutesdk/cutesdk-go/common/crypt"
+	"github.com/cutesdk/cutesdk-go/common/request"
 )
 
-// NotifyData 原始通知数据
-type NotifyData struct {
-	Appid      string `xml:"AppId"`
-	MsgEncrypt string `xml:"Encrypt"`
+// NotifyMsg: notify message type
+type NotifyMsg struct {
+	*request.Result
+	receiveId string
 }
 
-// ReplyMsg 回复消息
-type ReplyMsg struct {
-	Type        string
-	TextContent string
+// ReceiveId: get receiveId
+func (n *NotifyMsg) ReceiveId() string {
+	return n.receiveId
 }
 
-// MsgHandler 消息处理器
-type MsgHandler func(msg *Result) *ReplyMsg
+// NotifyHandler: notify handler
+type NotifyHandler func(*NotifyMsg) *ReplyMsg
 
-// HandleNotify 处理通知
-func (w *WxOpen) HandleNotify(req *http.Request, resp http.ResponseWriter, msgHandler MsgHandler) error {
-	res, err := w.GetNotifyData(req)
+// Listen: listen notify
+func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
+	msg, err := ins.GetNotifyMsg(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("get notify message failed: %v", err)
 	}
 
-	if msgHandler != nil {
-		replyMsg := msgHandler(&res)
-		if replyMsg != nil {
-			resp.Write(([]byte(fmt.Sprintf("reply:%v", replyMsg))))
-		}
+	if notifyHandler == nil {
+		return nil
 	}
 
-	return nil
-}
+	replyMsg := notifyHandler(msg)
 
-// ReplySuccess 回复字符串success
-func (w *WxOpen) ReplySuccess(resp http.ResponseWriter) error {
-	_, err := resp.Write([]byte("success"))
-
-	return err
-}
-
-// Reply 回复消息
-func (w *WxOpen) Reply() error {
-	return nil
-}
-
-// GetNotifyData 获取通知数据
-func (w *WxOpen) GetNotifyData(req *http.Request) (Result, error) {
-	queryParams := req.URL.Query()
-	timestamp := queryParams.Get("timestamp")
-	nonce := queryParams.Get("nonce")
-	// signature := queryParams.Get("signature")
-	msgSignature := queryParams.Get("msg_signature")
-
-	if timestamp == "" || nonce == "" || msgSignature == "" {
-		return nil, fmt.Errorf("notify data with invalid params")
+	if replyMsg == nil {
+		return ins.ReplySuccess(resp)
 	}
 
+	return ins.ReplyEncryptedMsg(resp, replyMsg)
+}
+
+// GetReqBody: get request data in body
+func (ins *Instance) GetReqBody(req *http.Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		return nil, fmt.Errorf("notify data with invalid body: %v", err)
+		return nil, fmt.Errorf("invalid notify data: %v", err)
 	}
-	defer req.Body.Close()
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
-	notifyData := &NotifyData{}
-	err = xml.Unmarshal(body, &notifyData)
-	if err != nil || notifyData.MsgEncrypt == "" || notifyData.Appid != w.opts.Appid {
-		return nil, fmt.Errorf("notify data unmarshal failed")
-	}
-
-	if err := w.VerifyNotifyData(timestamp, nonce, msgSignature, notifyData.MsgEncrypt); err != nil {
-		return nil, fmt.Errorf("notify data verify failed: %v", err)
-	}
-
-	res, err := w.DecryptNotifyData(notifyData.MsgEncrypt)
-	if err != nil {
-		return nil, fmt.Errorf("notify data decrypt failed: %v", err)
-	}
-
-	return res, nil
+	return body, nil
 }
 
-// VerifyNotifyData 验证通知数据
-// signature=sha1(sort(Token、timestamp、nonce, msg_encrypt))
-func (w *WxOpen) VerifyNotifyData(timestamp, nonce, msgSignature, msgEncrypt string) error {
-	arr := []string{w.opts.VerifyToken, timestamp, nonce, msgEncrypt}
-	// 字典序排列
-	sort.Strings(arr)
-	// sha1 加密
-	signature := crypt.Sha1Encode([]byte(strings.Join(arr, "")))
-	fmt.Println(signature)
-	if signature != msgSignature {
-		return errors.New("invalid signature")
+// VerifyNotifyMsg: verify notify message
+func (ins *Instance) VerifyNotifyMsg(req *http.Request, msgEncrypt string) error {
+	params := req.URL.Query()
+
+	timestamp := params.Get("timestamp")
+	nonce := params.Get("nonce")
+	msgSignature := params.Get("msg_signature")
+
+	calSign := crypt.GenMsgSignature(ins.opts.VerifyToken, timestamp, nonce, msgEncrypt)
+	if calSign != msgSignature {
+		return fmt.Errorf("invalid signature")
 	}
 
 	return nil
 }
 
-// DecryptNotifyData 解密通知数据
-func (w *WxOpen) DecryptNotifyData(encryptedData string) (Result, error) {
-	rawData, err := crypt.Base64Decode(encryptedData)
+// GetNotifyMsg: get notify message
+func (ins *Instance) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
+	reqBody, err := ins.GetReqBody(req)
 	if err != nil {
 		return nil, err
 	}
 
-	decryptedData, err := crypt.AesCbcDecrypt(rawData, w.opts.aesKey, nil)
+	msg := request.NewResult(reqBody)
+	msg.XmlParsed()
+
+	msgEncrypt := msg.GetString("Encrypt")
+	if msgEncrypt == "" {
+		return nil, fmt.Errorf("invalid msg_encrypt")
+	}
+
+	// verify notify message
+	if err := ins.VerifyNotifyMsg(req, msgEncrypt); err != nil {
+		return nil, fmt.Errorf("verify notify msg failed: %v", err)
+	}
+
+	// decrypt message
+	contentB, receiveId, err := crypt.DecryptWithAesKey(ins.opts.aesKey, msgEncrypt)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decrypt message failed: %v", err)
 	}
 
-	if len(decryptedData) < 20 {
-		return nil, errors.New("decrypt error: invalid data length")
+	res := request.NewResult(contentB)
+	res.XmlParsed()
+
+	notifyMsg := &NotifyMsg{
+		res,
+		receiveId,
 	}
 
-	// 读取有效内容长度
-	contentLen := getBytesLen(decryptedData[16:20])
-	if contentLen > len(decryptedData)-20 {
-		return nil, errors.New("decrypt error: invalid content length")
-	}
-
-	// 有效内容
-	contentB := decryptedData[20 : 20+contentLen]
-
-	// 尾部的开放平台appid
-	appidB := decryptedData[20+contentLen:]
-
-	if string(appidB) != w.opts.Appid {
-		return nil, errors.New("decrypt error: invalid appid")
-	}
-
-	return Result(contentB), nil
-}
-
-// 获取网络字节序
-func getBytesLen(bytes []byte) int {
-	var num = 0
-	for i := 0; i < 4; i++ {
-		num <<= 8
-		num |= (int)(bytes[i] & 0xff)
-	}
-
-	return num
+	return notifyMsg, err
 }

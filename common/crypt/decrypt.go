@@ -1,23 +1,15 @@
 package crypt
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
 	"encoding/base64"
 	"errors"
 
 	"github.com/cutesdk/cutesdk-go/common/request"
+	"github.com/idoubi/goutils/crypt"
 )
 
-var (
-	ErrAppIDNotMatch       = errors.New("app id not match")
-	ErrInvalidBlockSize    = errors.New("invalid block size")
-	ErrInvalidPKCS7Data    = errors.New("invalid PKCS7 data")
-	ErrInvalidPKCS7Padding = errors.New("invalid padding on input")
-)
-
-// DecryptData: decrypt data
-func DecryptData(sessionKey, encryptedData, iv string) (request.Result, error) {
+// DecryptWithSessionKey: decrypt data
+func DecryptWithSessionKey(sessionKey, encryptedData, iv string) (*request.Result, error) {
 	src, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return nil, err
@@ -33,40 +25,60 @@ func DecryptData(sessionKey, encryptedData, iv string) (request.Result, error) {
 		return nil, err
 	}
 
-	block, err := aes.NewCipher(_key)
+	decryptedData, err := crypt.AesCbcDecrypt(src, _key, _iv)
 	if err != nil {
 		return nil, err
 	}
 
-	mode := cipher.NewCBCDecrypter(block, _iv)
-	dst := make([]byte, len(src))
-	mode.CryptBlocks(dst, src)
-
-	dst, err = pkcs7Unpad(dst, block.BlockSize())
-	if err != nil {
-		return nil, err
-	}
-
-	return request.Result(dst), nil
+	return request.NewResult(decryptedData), nil
 }
 
-// pkcs7Unpad returns slice of the original data without padding
-func pkcs7Unpad(data []byte, blockSize int) ([]byte, error) {
-	if blockSize <= 0 {
-		return nil, ErrInvalidBlockSize
+// DecryptWithAesKey: decrypt with aesKey
+func DecryptWithAesKey(aesKey []byte, encryptedData string) ([]byte, string, error) {
+	rawData, err := crypt.Base64Decode(encryptedData)
+	if err != nil {
+		return nil, "", err
 	}
-	if len(data)%blockSize != 0 || len(data) == 0 {
-		return nil, ErrInvalidPKCS7Data
+
+	decryptedData, err := crypt.AesCbcDecrypt(rawData, aesKey, nil)
+	if err != nil {
+		return nil, "", err
 	}
-	c := data[len(data)-1]
-	n := int(c)
-	if n == 0 || n > len(data) {
-		return nil, ErrInvalidPKCS7Padding
+
+	if len(decryptedData) < 20 {
+		return nil, "", errors.New("decrypt error: invalid data length")
 	}
-	for i := 0; i < n; i++ {
-		if data[len(data)-n+i] != c {
-			return nil, ErrInvalidPKCS7Padding
-		}
+
+	contentLen := getBytesLen(decryptedData[16:20])
+	if contentLen > len(decryptedData)-20 {
+		return nil, "", errors.New("decrypt error: invalid content length")
 	}
-	return data[:len(data)-n], nil
+
+	contentB := decryptedData[20 : 20+contentLen]
+
+	// parse receiveId
+	receiveIdB := decryptedData[20+contentLen:]
+
+	return contentB, string(receiveIdB), nil
+}
+
+// get bytes length
+func getBytesLen(bytes []byte) int {
+	var num = 0
+	for i := 0; i < 4; i++ {
+		num <<= 8
+		num |= (int)(bytes[i] & 0xff)
+	}
+
+	return num
+}
+
+// get length bytes
+func getLenBytes(num int) []byte {
+	return []byte{
+		(byte)(num >> 24 & 0xFF),
+		(byte)(num >> 16 & 0xF),
+		(byte)(num >> 8 & 0xFF),
+		(byte)(num & 0xFF),
+	}
 }

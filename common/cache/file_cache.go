@@ -39,3 +39,14 @@ func (c *FileCache) Get(key string) (interface{}, error) {
 
 	return value, nil
 }
+
+// Delete: delete data from cache
+func (c *FileCache) Delete(key string) error {
+	err := c.cache.Del(key)
+
+	if err != nil {
+		return errors.New("delete cache failed")
+	}
+
+	return nil
+}

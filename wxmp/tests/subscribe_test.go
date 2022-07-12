@@ -1,32 +1,36 @@
 package tests
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestSendSubscribeMsg(t *testing.T) {
-	client := getClient()
+	ins := getIns()
 
-	tplId := "LTA5XpzSBWQQ3YI0hOw9Ucj-U1bvZIB_Ut9kHAhNBEk"
-	openid := "orNyi07T5GeE2nwVV7b1dJ3xGnPM"
-	page := "https://idoubi.cc"
+	uri := "/cgi-bin/message/subscribe/bizsend"
 
-	data := map[string]interface{}{
-		"thing5": map[string]interface{}{
-			"value": "idoubi",
+	params := map[string]interface{}{
+		"touser":      "xxx",
+		"template_id": "xxx-xxx",
+		"page":        "https://xxx.com",
+		"data": map[string]interface{}{
+			"thing5": map[string]interface{}{
+				"value": "xxx",
+			},
+			"thing7": map[string]interface{}{
+				"value": "content",
+			},
+			"time2": map[string]interface{}{
+				"value": "2021-12-02 13:11",
+			},
 		},
-		"thing7": map[string]interface{}{
-			"value": "content",
-		},
-		"time2": map[string]interface{}{
-			"value": "2021-12-02 13:11",
+		"miniprogram": map[string]interface{}{
+			"appid":    "xxx",
+			"pagepath": "pages/index/index?scene=123",
 		},
 	}
 
-	miniprogram := map[string]interface{}{
-		"appid":    "wx25da2eca8fa3f4ef",
-		"pagepath": "pages/index/index?scene=123",
-	}
+	res, err := ins.PostWithAccessToken(uri, params)
 
-	res, err := client.SendSubscribeMsg(tplId, openid, data, page, miniprogram)
-
-	t.Error(res, err)
+	t.Error(res.GetInt("errcode"), err)
 }

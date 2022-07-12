@@ -1,11 +1,23 @@
 package tests
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestGetCurrentMen(t *testing.T) {
-	client := getClient()
+	ins := getIns()
 
-	res, err := client.GetCurrentMenu()
+	accessToken, err := ins.GetAccessToken()
+	if err != nil {
+		t.Fatalf("get access_token failed: %v", err)
+	}
 
-	t.Error(res, err)
+	uri := fmt.Sprintf("/cgi-bin/get_current_selfmenu_info?access_token=%s", accessToken)
+
+	res, err := ins.Get(uri)
+
+	res.Raw()
+
+	t.Error(res.GetArray("selfmenu_info.button"), err)
 }

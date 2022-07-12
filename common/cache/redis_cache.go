@@ -16,17 +16,23 @@ type RedisCache struct {
 
 // NewRedisCache: init cache component
 func NewRedisCache(conf map[string]interface{}) (*RedisCache, error) {
-	dsn := ""
-	if v, ok := conf["dsn"]; ok {
-		dsn = v.(string)
-	}
-
 	timeout := 5 * time.Second
 	if v, ok := conf["timeout"]; ok {
 		ts := v.(string)
 		if t, err := time.ParseDuration(ts); err == nil {
 			timeout = t
 		}
+	}
+
+	if v, ok := conf["client"]; ok {
+		if cache, ok := v.(*redis.Client); ok {
+			return &RedisCache{cache, timeout}, nil
+		}
+	}
+
+	dsn := ""
+	if v, ok := conf["dsn"]; ok {
+		dsn = v.(string)
 	}
 
 	if dsn == "" {
@@ -68,4 +74,14 @@ func (c *RedisCache) Get(key string) (interface{}, error) {
 	value, err := c.cache.Do(ctx, "GET", key).Result()
 
 	return value, err
+}
+
+// Delete: delete data from cache
+func (c *RedisCache) Delete(key string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
+	defer cancel()
+
+	_, err := c.cache.Do(ctx, "DEL", key).Result()
+
+	return err
 }

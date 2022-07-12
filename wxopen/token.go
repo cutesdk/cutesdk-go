@@ -1,41 +1,25 @@
 package wxopen
 
 import (
-	"github.com/idoubi/goz"
+	"fmt"
+
+	"github.com/cutesdk/cutesdk-go/common/request"
 )
 
-const (
-	ComponentAccessToken = "COMPONENT_ACCESS_TOKEN"
-)
-
-// GetComponentAccessToken 获取 component_access_token
-func (w *WxOpen) GetComponentAccessToken() (Result, error) {
-	apiUrl := apiBase + "/cgi-bin/component/api_component_token"
-
-	ticket, err := w.getComponentVerifyTicket()
+// FetchComponentAccessToken: request api to fetch component_access_token
+func (ins *Instance) FetchComponentAccessToken() (*request.Result, error) {
+	componentVerifyTicket, err := ins.GetComponentVerifyTicket()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get component_verify_ticket failed: %v", err)
 	}
 
-	resp, err := goz.Post(apiUrl, goz.Options{
-		Debug: w.opts.Debug,
-		JSON: map[string]string{
-			"component_appid":         w.opts.Appid,
-			"component_appsecret":     w.opts.AppSecret,
-			"component_verify_ticket": ticket,
-		},
+	uri := "/cgi-bin/component/api_component_token"
+
+	res, err := ins.Post(uri, map[string]interface{}{
+		"component_verify_ticket": componentVerifyTicket,
+		"component_appid":         ins.GetComponentAppid(),
+		"component_appsecret":     ins.GetComponentAppsecret(),
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	body, err := resp.GetBody()
-
-	return Result(body), err
-}
-
-// getComponentAccessToken 获取 component_access_token
-func (w *WxOpen) getComponentAccessToken() (string, error) {
-	return "52_QLd-4ZVQLsHo-Te8LwDE_gdT4B_taPNBQgSqxvwVKTa9rZqDGW7MB0zC0qo7V3c8Jv49pOOzhvAp7AwCFTJxXbfbIB08OXuxZjn3guWmaF8DaUB4LzjZYjd9hXSGCykQiyy-FvgRGehc4JIFIAPiAFANFU", nil
+	return res, err
 }

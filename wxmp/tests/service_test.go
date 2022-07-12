@@ -1,20 +1,29 @@
 package tests
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestSendServiceMsg(t *testing.T) {
-	client := getClient()
+	ins := getIns()
 
-	openid := "orNyi07T5GeE2nwVV7b1dJ3xGnPM"
-	msgtype := "text"
-
-	params := map[string]interface{}{
-		"content": "hello world",
+	accessToken, err := ins.GetAccessToken()
+	if err != nil {
+		t.Fatalf("get access_token failed: %v", err)
 	}
 
-	res, err := client.SendServiceMsg(openid, msgtype, params)
+	uri := fmt.Sprintf("/cgi-bin/message/custom/send?access_token=%s", accessToken)
 
-	t.Error(res, err)
+	data := map[string]interface{}{
+		"touser":  "xxx",
+		"msgtype": "text",
+		"text": map[string]interface{}{
+			"content": "hello world",
+		},
+	}
+
+	res, err := ins.Post(uri, data)
+
+	t.Error(res.GetInt("errcode"), err)
 }
