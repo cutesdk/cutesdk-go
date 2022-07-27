@@ -4,18 +4,22 @@ import (
 	"fmt"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/cutesdk/cutesdk-go/wxwork"
 )
 
 func getServiceIns() *wxwork.Instance {
 	opts := &wxwork.Options{
-		Corpid:  "xxx",
+		Corpid:  "ww8b7343f7397a7d22",
 		Agentid: "service",
-		Secret:  "xxx",
+		Secret:  "q3PwXW-HK3Bo3uqVyvQT6dMvmtxfLrP04j_bXvFUQJc",
+		Debug:   true,
 	}
 
 	ins, _ := wxwork.New(opts)
+
+	ins.SetAccessToken("wdKvjEXLbqRo6iMgSsr3YlsIg7-FAMXegzMDKzOfjvDG9DYTYUhvWjXe_04MXR4iaQJggWWE8j-oFTvhv9ehAoxhogL1foJNkxsyXAerlI8Zx8AKw6ajHkZr0d-0Zsr_IbxeYLZJLN7SInQ2tbGSoCUo8JpTcjqghJtUsWgvWbuvB_IXqtwxMyCzcOvUvbI-c-8cLeJ-TpKfcV8O4rnwCg", 1*time.Hour)
 
 	return ins
 }
@@ -31,8 +35,8 @@ func TestAddServiceAccount(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/kf/account/add?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"name":     "小客服",
-		"media_id": "xxx-xxx",
+		"name":     "你好朋友",
+		"media_id": "3Vf19PeY1aL9sFAbyfzA9Mrz5t65R4XlRLbCjbr1yppJ5b_9IOMupCtYTM9YNBmdq",
 	}
 
 	res, err := ins.Post(uri, params)
@@ -51,9 +55,9 @@ func TestUpdateServiceAccount(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/kf/account/update?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"open_kfid": "xxx",
+		"open_kfid": "wkFtUHbgAAIgVvkwQgS88lYAFYl8mTZw",
 		"name":      "大客服",
-		"media_id":  "xxx-xxx",
+		"media_id":  "3Vf19PeY1aL9sFAbyfzA9Mrz5t65R4XlRLbCjbr1yppJ5b_9IOMupCtYTM9YNBmdq",
 	}
 
 	res, err := ins.Post(uri, params)
@@ -92,8 +96,8 @@ func TestCreateServiceUrl(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/kf/add_contact_way?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"open_kfid": "xxx",
-		"scene":     "oid=3",
+		"open_kfid": "wkFtUHbgAAu1dGdoGKf0Ggoos60IclKg",
+		"scene":     "cae9846af84b52f56c1f74d8202c509b",
 	}
 
 	res, err := ins.Post(uri, params)
@@ -122,7 +126,7 @@ func TestGetServicers(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/kf/servicer/list?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"open_kfid": "xxx",
+		"open_kfid": "wkFtUHbgAAaVpFUV8VL-0-pwn8OFAMWA",
 	}
 
 	res, err := ins.Get(uri, params)
@@ -141,7 +145,7 @@ func TestAddServicer(t *testing.T) {
 	uri := fmt.Sprintf("/cgi-bin/kf/servicer/add?access_token=%s", accessToken)
 
 	params := map[string]interface{}{
-		"open_kfid":          "xxx",
+		"open_kfid":          "wkFtUHbgAAaVpFUV8VL-0-pwn8OFAMWA",
 		"department_id_list": []int64{1},
 	}
 

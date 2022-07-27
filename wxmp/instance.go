@@ -21,6 +21,9 @@ type Instance struct {
 	accessTokenHandler  token.IToken
 	jsapiTicketCacheKey string
 	jsapiTicketHandler  token.IToken
+	// authorizer info
+	authorizerAccessTokenCacheKey string
+	authorizerAccessTokenHandler  token.IToken
 }
 
 // New create wxmp instance
@@ -64,6 +67,13 @@ func New(opts *Options) (*Instance, error) {
 
 	// set request client
 	ins.requestClient = request.NewClient(opts.Request)
+
+	// return authorizer instance
+	if ins.opts.AuthorizerProvider != nil && ins.opts.AuthorizerRefreshToken != "" {
+		ins.SetAuthorizer(ins.opts.AuthorizerProvider, ins.opts.AuthorizerRefreshToken)
+
+		return ins, nil
+	}
 
 	// set default access_token cache key
 	accessTokenCacheKey := fmt.Sprintf("wxmp.access_token.%s", ins.GetAppid())
