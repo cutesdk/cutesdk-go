@@ -17,7 +17,7 @@ func (ins *Instance) GetOauthUrl(redirectUri, scope, state string, args ...strin
 	}
 
 	oauthBaseUri := "https://open.weixin.qq.com/connect/oauth2/authorize"
-	redirectUri = url.QueryEscape(redirectUri)
+	// redirectUri = url.QueryEscape(redirectUri)
 
 	params := url.Values{}
 	params.Set("appid", ins.GetAppid())
