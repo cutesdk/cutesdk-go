@@ -8,7 +8,7 @@ import (
 )
 
 // GetOauthUrl: get oauth url
-func (ins *Instance) GetOauthUrl(redirectUri, scope, state string) (*url.URL, error) {
+func (ins *Instance) GetOauthUrl(redirectUri, scope, state string, args ...string) (*url.URL, error) {
 	if redirectUri == "" {
 		return nil, fmt.Errorf("invalid redirectUri")
 	}
@@ -19,7 +19,21 @@ func (ins *Instance) GetOauthUrl(redirectUri, scope, state string) (*url.URL, er
 	oauthBaseUri := "https://open.weixin.qq.com/connect/oauth2/authorize"
 	redirectUri = url.QueryEscape(redirectUri)
 
-	oauthUrl := fmt.Sprintf("%s?appid=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s#wechat_redirect", oauthBaseUri, ins.GetAppid(), redirectUri, scope, state)
+	params := url.Values{}
+	params.Set("appid", ins.GetAppid())
+	params.Set("redirect_uri", redirectUri)
+	params.Set("response_type", "code")
+	params.Set("scope", scope)
+	params.Set("state", state)
+
+	if len(args) > 0 {
+		params.Set("forcePopup", args[0])
+	}
+	if len(args) > 1 {
+		params.Set("forceSnapShot", args[1])
+	}
+
+	oauthUrl := fmt.Sprintf("%s?%s#wechat_redirect", oauthBaseUri, params.Encode())
 
 	return url.Parse(oauthUrl)
 }
