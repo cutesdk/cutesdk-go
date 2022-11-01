@@ -7,13 +7,15 @@ import (
 
 // Options: custom options
 type Options struct {
-	Debug     bool
-	Request   *request.Options
-	Cache     *cache.Options
-	MchId     string
-	Appid     string
-	SubMchId  string
-	SubAppid  string
-	ApiKey    string
-	NotifyUrl string
+	Debug      bool
+	Request    *request.Options
+	Cache      *cache.Options
+	MchId      string
+	Appid      string
+	SubMchId   string
+	SubAppid   string
+	ApiKey     string
+	CertKey    string
+	PrivateKey string
+	NotifyUrl  string
 }

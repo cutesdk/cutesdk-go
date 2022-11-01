@@ -49,10 +49,26 @@ func TestCreateComplaintNotifyUrl(t *testing.T) {
 	uri := "/v3/merchant-service/complaint-notifications"
 
 	params := map[string]interface{}{
-		"url": "https://testapi.idoustudio.com/wxpay/complaint-notify",
+		"url": fmt.Sprintf("https://wxapi.idoustudio.com/complaint/notify/%s", ins.GetOptions().MchId),
 	}
 
 	res, err := ins.Post(uri, params)
+
+	wxerr := wxpay.UnwrapError(err)
+
+	t.Error(res, wxerr)
+}
+
+func TestUpdateComplaintNotifyUrl(t *testing.T) {
+	ins := getPayIns()
+
+	uri := "/v3/merchant-service/complaint-notifications"
+
+	params := map[string]interface{}{
+		"url": fmt.Sprintf("https://wxapi.idoustudio.com/complaint/notify/%s", ins.GetOptions().MchId),
+	}
+
+	res, err := ins.Put(uri, params)
 
 	wxerr := wxpay.UnwrapError(err)
 

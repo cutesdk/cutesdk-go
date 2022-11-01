@@ -1,7 +1,9 @@
 package wxpay
 
 import (
+	"crypto/tls"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/cutesdk/cutesdk-go/common/request"
@@ -40,7 +42,7 @@ func New(opts *Options) (*Instance, error) {
 }
 
 // BuildParams: build params with sign
-func (ins *Instance) BuildParams(params map[string]interface{}) (map[string]interface{}, error) {
+func (ins *Instance) BuildParams(uri string, params map[string]interface{}) (map[string]interface{}, error) {
 	if params == nil {
 		return nil, fmt.Errorf("invalid params")
 	}
@@ -54,9 +56,13 @@ func (ins *Instance) BuildParams(params map[string]interface{}) (map[string]inte
 	}
 
 	params["mch_id"] = ins.opts.MchId
-	params["appid"] = ins.opts.Appid
 	params["nonce_str"] = goutils.NonceStr(32)
-	params["sign_type"] = signType
+
+	// 现金红包接口特殊处理
+	if !strings.Contains(uri, "sendredpack") {
+		params["appid"] = ins.opts.Appid
+		params["sign_type"] = signType
+	}
 
 	if signType == "HMAC-SHA256" {
 		params["sign"] = SignWithHmacSha256(params, ins.opts.ApiKey)
@@ -69,12 +75,39 @@ func (ins *Instance) BuildParams(params map[string]interface{}) (map[string]inte
 
 // Post: request api with post method
 func (ins *Instance) Post(uri string, params map[string]interface{}) (*request.Result, error) {
-	data, err := ins.BuildParams(params)
+	data, err := ins.BuildParams(uri, params)
 	if err != nil {
 		return nil, err
 	}
 
 	res, err := ins.GetRequestClient().PostXml(uri, data)
+	if err != nil {
+		return nil, err
+	}
+
+	res.XmlParsed()
+
+	return res, nil
+}
+
+// PostWithCert: request post api with cert content
+func (ins *Instance) PostWithCert(uri string, params map[string]interface{}) (*request.Result, error) {
+	data, err := ins.BuildParams(uri, params)
+	if err != nil {
+		return nil, err
+	}
+
+	cliOpts := ins.GetRequestClient().GetOptions()
+	if ins.opts.CertKey != "" && ins.opts.PrivateKey != "" {
+		certificates := []tls.Certificate{}
+		if crt, err := tls.X509KeyPair([]byte(ins.opts.CertKey), []byte(ins.opts.PrivateKey)); err == nil {
+			certificates = append(certificates, crt)
+			cliOpts.Certificates = certificates
+		}
+	}
+	cli := request.NewClient(cliOpts)
+
+	res, err := cli.PostXml(uri, data)
 	if err != nil {
 		return nil, err
 	}

@@ -29,10 +29,11 @@ func (c *Client) Get(uri string, args ...map[string]interface{}) (*Result, error
 	method := "GET"
 
 	opts := goz.Options{
-		Debug:   c.opts.Debug,
-		Timeout: float32(c.opts.Timeout.Seconds()),
-		Query:   params,
-		Headers: headers,
+		Debug:        c.opts.Debug,
+		Timeout:      float32(c.opts.Timeout.Seconds()),
+		Query:        params,
+		Headers:      headers,
+		Certificates: c.opts.Certificates,
 	}
 
 	return c.Request(method, uri, opts)
@@ -53,10 +54,11 @@ func (c *Client) Post(uri string, args ...map[string]interface{}) (*Result, erro
 	method := "POST"
 
 	opts := goz.Options{
-		Debug:   c.opts.Debug,
-		Timeout: float32(c.opts.Timeout.Seconds()),
-		JSON:    data,
-		Headers: headers,
+		Debug:        c.opts.Debug,
+		Timeout:      float32(c.opts.Timeout.Seconds()),
+		JSON:         data,
+		Headers:      headers,
+		Certificates: c.opts.Certificates,
 	}
 
 	return c.Request(method, uri, opts)
@@ -77,10 +79,11 @@ func (c *Client) PostXml(uri string, args ...map[string]interface{}) (*Result, e
 	method := "POST"
 
 	opts := goz.Options{
-		Debug:   c.opts.Debug,
-		Timeout: float32(c.opts.Timeout.Seconds()),
-		XML:     data,
-		Headers: headers,
+		Debug:        c.opts.Debug,
+		Timeout:      float32(c.opts.Timeout.Seconds()),
+		XML:          data,
+		Headers:      headers,
+		Certificates: c.opts.Certificates,
 	}
 
 	return c.Request(method, uri, opts)
@@ -105,4 +108,9 @@ func (c *Client) Request(method string, uri string, opts goz.Options) (*Result, 
 	}
 
 	return NewResult(body), err
+}
+
+// GetOptions: get request options
+func (c *Client) GetOptions() *Options {
+	return c.opts
 }
