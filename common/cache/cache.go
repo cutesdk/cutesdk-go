@@ -5,10 +5,13 @@ import (
 )
 
 // NewCache: new cache handler
-func NewCache(opts *Options) (ICache, error) {
+func NewCache(iopts IOptions) (ICache, error) {
+	opts := iopts.ToOptions()
+
 	if opts == nil {
 		return nil, errors.New("invalid cache options")
 	}
+
 	driver := opts.Driver
 	conf := opts.Conf
 
