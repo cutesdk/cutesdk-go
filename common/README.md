@@ -4,8 +4,8 @@ cutesdk common components.
 
 ## usage
 
-```shell
-go get -u github.com/cutesdk/cutesdk-go/common
+```go
+import "github.com/cutesdk/cutesdk-go/common"
 ```
 
 ## components

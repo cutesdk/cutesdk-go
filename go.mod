@@ -1,14 +1,17 @@
 module github.com/cutesdk/cutesdk-go
 
-go 1.17
+go 1.16
 
 require (
 	github.com/idoubi/goutils v1.1.0
 	github.com/idoubi/goz v1.3.2
-	github.com/tidwall/gjson v1.14.3
+	github.com/tidwall/gjson v1.14.4 // indirect
 )
 
-require github.com/wechatpay-apiv3/wechatpay-go v0.2.14
+require (
+	github.com/cutesdk/cutesdk-go/common v0.0.0-20221227122143-470193c44e40
+	github.com/wechatpay-apiv3/wechatpay-go v0.2.14
+)
 
 require (
 	github.com/basgys/goxml2json v1.1.0 // indirect
@@ -21,11 +24,10 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/yoda-of-soda/map2xml v1.0.2 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
 
 require (
-	github.com/go-redis/redis/v8 v8.11.5
-	github.com/liyaojian/cache v0.0.0-20220121124504-b978a1a38253
+	github.com/go-redis/redis/v8 v8.11.5 // indirect
+	github.com/liyaojian/cache v0.0.0-20220121124504-b978a1a38253 // indirect
 	golang.org/x/net v0.1.0 // indirect
 )

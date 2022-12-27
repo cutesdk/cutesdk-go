@@ -2,12 +2,6 @@
 
 qq miniapp sdk
 
-## install
-
-```shell
-go get -u github.com/cutesdk/cutesdk-go/qqapp
-```
-
 ## usage
 
 take [create qrcode api](https://q.qq.com/wiki/develop/game/server/open-port/qr-code.html) for example: 
