@@ -9,22 +9,21 @@ func ExampleCode2Session() {
 	client := getClient()
 
 	code := "xxx"
-	anonymousCode := "xxx"
 
-	uri := "/api/apps/v2/jscode2session"
+	uri := "/sns/jscode2session"
 	params := map[string]interface{}{
-		"appid":          client.GetAppid(),
-		"secret":         client.GetSecret(),
-		"code":           code,
-		"anonymous_code": anonymousCode,
+		"appid":      client.GetAppid(),
+		"secret":     client.GetSecret(),
+		"js_code":    code,
+		"grant_type": "authorization_code",
 	}
 
-	res, err := client.Post(uri, params)
+	res, err := client.Get(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
 
-	openid := res.GetString("data.openid")
+	openid := res.GetString("openid")
 	if openid == "" {
 		log.Fatalf("code2session failed: %s\n", res)
 	}
