@@ -3,13 +3,13 @@ package ttapp
 import "github.com/cutesdk/cutesdk-go/common/request"
 
 // FetchAccessToken: request get_access_token api
-func (ins *Instance) FetchAccessToken() (*request.Result, error) {
+func (cli *Client) FetchAccessToken() (*request.Result, error) {
 	apiPath := "/api/apps/v2/token"
 
-	res, err := ins.Post(apiPath, map[string]interface{}{
+	res, err := cli.Post(apiPath, map[string]interface{}{
 		"grant_type": "client_credential",
-		"appid":      ins.GetAppid(),
-		"secret":     ins.GetSecret(),
+		"appid":      cli.GetAppid(),
+		"secret":     cli.GetSecret(),
 	})
 
 	return res, err
