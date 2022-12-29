@@ -7,19 +7,19 @@ import (
 
 // JsapiTicket: default jsapi_ticket handler
 type JsapiTicket struct {
-	ins *Instance
+	cli *Client
 }
 
 // NewJsapiTicket: init jsapi_ticket handler
-func NewJsapiTicket(ins *Instance) *JsapiTicket {
-	return &JsapiTicket{ins}
+func NewJsapiTicket(cli *Client) *JsapiTicket {
+	return &JsapiTicket{cli}
 }
 
 // GetToken: get jsapi_ticket, from cache or api
 func (t *JsapiTicket) GetToken() (string, error) {
-	cacheKey := t.ins.GetJsapiTicketCacheKey()
+	cacheKey := t.cli.GetJsapiTicketCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// get jsapi_ticket from cache
 	if v, err := cache.Get(cacheKey); err == nil && v != nil {
@@ -34,12 +34,12 @@ func (t *JsapiTicket) GetToken() (string, error) {
 
 // RefreshToken: get jsapi_ticket
 func (t *JsapiTicket) RefreshToken() (string, error) {
-	cacheKey := t.ins.GetJsapiTicketCacheKey()
+	cacheKey := t.cli.GetJsapiTicketCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// get jsapi_ticket from api
-	res, err := t.ins.FetchJsapiTicket()
+	res, err := t.cli.FetchJsapiTicket()
 	if err != nil {
 		return "", fmt.Errorf("fetch ticket failed: %v", err)
 	}
@@ -60,9 +60,9 @@ func (t *JsapiTicket) RefreshToken() (string, error) {
 
 // SetToken: set jsapi_ticket to cache
 func (t *JsapiTicket) SetToken(token string, expire time.Duration) error {
-	cacheKey := t.ins.GetJsapiTicketCacheKey()
+	cacheKey := t.cli.GetJsapiTicketCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// set jsapi_ticket to cache
 	return cache.Set(cacheKey, token, expire)

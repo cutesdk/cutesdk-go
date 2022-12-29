@@ -18,8 +18,8 @@ type JssdkConfig struct {
 }
 
 // GetJssdkConfig: get js-sdk config
-func (ins *Instance) GetJssdkConfig(url string) (*JssdkConfig, error) {
-	jsapiTicket, err := ins.GetJsapiTicket()
+func (cli *Client) GetJssdkConfig(url string) (*JssdkConfig, error) {
+	jsapiTicket, err := cli.GetJsapiTicket()
 	if err != nil {
 		return nil, fmt.Errorf("get jsapi_ticket failed: %v", err)
 	}
@@ -33,7 +33,7 @@ func (ins *Instance) GetJssdkConfig(url string) (*JssdkConfig, error) {
 
 	jssdkConfig := &JssdkConfig{
 		Debug:     false,
-		Appid:     ins.GetAppid(),
+		Appid:     cli.GetAppid(),
 		Timestamp: timestamp,
 		NonceStr:  nonceStr,
 		Signature: signature,

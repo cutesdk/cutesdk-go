@@ -12,8 +12,10 @@ import (
 	"github.com/idoubi/goutils/convert"
 )
 
+// CDATAText: xml data with CDATA
 type CDATAText string
 
+// MarshalXML: marshal xml data
 func (c CDATAText) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeElement(struct {
 		string `xml:",cdata"`
@@ -144,17 +146,17 @@ func (msg *NotifyMsg) ReplyNews(title, description, url, picUrl string) *ReplyMs
 }
 
 // EncryptReplyMsg: encrypt ReplyMsg
-func (ins *Instance) EncryptReplyMsg(msg *ReplyMsg) ([]byte, error) {
+func (svr *Server) EncryptReplyMsg(msg *ReplyMsg) ([]byte, error) {
 	xb := msg.Raw()
 
-	msgEncrypt, err := crypt.EncryptMsg(ins.opts.aesKey, xb, ins.opts.Appid)
+	msgEncrypt, err := crypt.EncryptMsg(svr.opts.aesKey, xb, svr.opts.Appid)
 	if err != nil {
 		return nil, fmt.Errorf("encrypt reply_msg failed: %v", err)
 	}
 
 	timestamp := goutils.TimestampStr()
 	nonce := goutils.NonceStr(16)
-	msgSignature := crypt.GenMsgSignature(ins.opts.VerifyToken, timestamp, nonce, msgEncrypt)
+	msgSignature := crypt.GenMsgSignature(svr.opts.VerifyToken, timestamp, nonce, msgEncrypt)
 
 	encryptedMsg := &EncryptedMsg{
 		Encrypt:      CDATAText(msgEncrypt),
@@ -172,8 +174,8 @@ func (ins *Instance) EncryptReplyMsg(msg *ReplyMsg) ([]byte, error) {
 }
 
 // ReplyEncryptedMsg: reply encrypted msg
-func (ins *Instance) ReplyEncryptedMsg(resp http.ResponseWriter, msg *ReplyMsg) error {
-	encryptedMsg, err := ins.EncryptReplyMsg(msg)
+func (svr *Server) ReplyEncryptedMsg(resp http.ResponseWriter, msg *ReplyMsg) error {
+	encryptedMsg, err := svr.EncryptReplyMsg(msg)
 	if err != nil {
 		return err
 	}
@@ -185,7 +187,7 @@ func (ins *Instance) ReplyEncryptedMsg(resp http.ResponseWriter, msg *ReplyMsg) 
 }
 
 // ReplyPlaintext: reply unencrypted msg
-func (ins *Instance) ReplyPlaintext(resp http.ResponseWriter, msg *ReplyMsg) error {
+func (svr *Server) ReplyPlaintext(resp http.ResponseWriter, msg *ReplyMsg) error {
 	resp.Header().Set("Content-Type", "text/xml")
 	_, err := resp.Write(msg.Raw())
 
@@ -193,7 +195,7 @@ func (ins *Instance) ReplyPlaintext(resp http.ResponseWriter, msg *ReplyMsg) err
 }
 
 // ReplySuccess: reply success status
-func (ins *Instance) ReplySuccess(resp http.ResponseWriter) error {
+func (svr *Server) ReplySuccess(resp http.ResponseWriter) error {
 	_, err := resp.Write([]byte("success"))
 
 	return err

@@ -8,7 +8,7 @@ import (
 )
 
 // GetOauthUrl: get oauth url
-func (ins *Instance) GetOauthUrl(redirectUri, scope, state string, args ...string) (*url.URL, error) {
+func (cli *Client) GetOauthUrl(redirectUri, scope, state string, args ...string) (*url.URL, error) {
 	if redirectUri == "" {
 		return nil, fmt.Errorf("invalid redirectUri")
 	}
@@ -20,7 +20,7 @@ func (ins *Instance) GetOauthUrl(redirectUri, scope, state string, args ...strin
 	// redirectUri = url.QueryEscape(redirectUri)
 
 	params := url.Values{}
-	params.Set("appid", ins.GetAppid())
+	params.Set("appid", cli.GetAppid())
 	params.Set("redirect_uri", redirectUri)
 	params.Set("response_type", "code")
 	params.Set("scope", scope)
@@ -39,19 +39,19 @@ func (ins *Instance) GetOauthUrl(redirectUri, scope, state string, args ...strin
 }
 
 // GetOauthToken: get oauth access_token
-func (ins *Instance) GetOauthToken(code string) (*request.Result, error) {
-	uri := fmt.Sprintf("/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", ins.GetAppid(), ins.GetSecret(), code)
+func (cli *Client) GetOauthToken(code string) (*request.Result, error) {
+	uri := fmt.Sprintf("/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", cli.GetAppid(), cli.GetSecret(), code)
 
-	res, err := ins.Get(uri)
+	res, err := cli.Get(uri)
 
 	return res, err
 }
 
 // GetOauthUser: get oauth userinfo
-func (ins *Instance) GetOauthUser(oauthAccessToken, openid string) (*request.Result, error) {
+func (cli *Client) GetOauthUser(oauthAccessToken, openid string) (*request.Result, error) {
 	uri := fmt.Sprintf("/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN", oauthAccessToken, openid)
 
-	res, err := ins.Get(uri)
+	res, err := cli.Get(uri)
 
 	return res, err
 }

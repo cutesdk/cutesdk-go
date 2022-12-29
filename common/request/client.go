@@ -1,6 +1,8 @@
 package request
 
 import (
+	"strings"
+
 	"github.com/idoubi/goz"
 )
 
@@ -82,6 +84,54 @@ func (c *Client) PostXml(uri string, args ...map[string]interface{}) (*Result, e
 		Debug:        c.opts.Debug,
 		Timeout:      float32(c.opts.Timeout.Seconds()),
 		XML:          data,
+		Headers:      headers,
+		Certificates: c.opts.Certificates,
+	}
+
+	return c.Request(method, uri, opts)
+}
+
+// PostMultipart: make api request with post method and multipart form data
+func (c *Client) PostMultipart(uri string, args ...map[string]interface{}) (*Result, error) {
+	data := map[string]interface{}{}
+	headers := map[string]interface{}{}
+
+	if len(args) > 0 {
+		data = args[0]
+	}
+	if len(args) > 1 {
+		headers = args[1]
+	}
+
+	method := "POST"
+
+	multipart := []goz.FormData{}
+	for k, v := range data {
+		value, ok := v.(string)
+		if !ok {
+			continue
+		}
+
+		// file
+		if strings.HasPrefix(value, "@") {
+			multipart = append(multipart, goz.FormData{
+				Name:     k,
+				Filepath: strings.Replace(value, "@", "", 1),
+			})
+			continue
+		}
+
+		// not file
+		multipart = append(multipart, goz.FormData{
+			Name:     k,
+			Contents: []byte(value),
+		})
+	}
+
+	opts := goz.Options{
+		Debug:        c.opts.Debug,
+		Timeout:      float32(c.opts.Timeout.Seconds()),
+		Multipart:    multipart,
 		Headers:      headers,
 		Certificates: c.opts.Certificates,
 	}

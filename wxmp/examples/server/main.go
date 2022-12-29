@@ -1,11 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/cutesdk/cutesdk-go/wxmp"
+)
+
+var (
+	verifyToken    = "xxx"
+	encodingAesKey = "xxx"
 )
 
 type Mux struct {
@@ -14,11 +19,11 @@ type Mux struct {
 func (m *Mux) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	route := req.URL.Path
 
-	fmt.Printf("route: %s\n", route)
+	log.Printf("route: %s\n", route)
 
 	if strings.HasPrefix(route, "/msg-notify/") {
 		appid := strings.Replace(route, "/msg-notify/", "", 1)
-		fmt.Printf("msg appid: %s\n", appid)
+		log.Printf("msg appid: %s\n", appid)
 
 		MsgNotifyHandler(appid, resp, req)
 		return
@@ -30,52 +35,43 @@ func (m *Mux) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 func main() {
 	mux := new(Mux)
 
-	err := http.ListenAndServe(":8092", mux)
-	fmt.Printf("server listen: %v", err)
+	err := http.ListenAndServe(":8082", mux)
+	log.Printf("server listen: %v", err)
 }
 
 func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request) {
-	ins := getIns()
+	server := getServer()
 
-	err := ins.Listen(req, resp, func(msg *wxmp.NotifyMsg) *wxmp.ReplyMsg {
-		appid := msg.ReceiveId()
-		fmt.Printf("notify receive appid: %s\n", appid)
+	err := server.Listen(req, resp, func(msg *wxmp.NotifyMsg) *wxmp.ReplyMsg {
+		log.Printf("notify msg: %s\n", msg)
 
 		msgType := msg.GetString("MsgType")
-		fmt.Printf("notify msg type: %s\n", msgType)
-
-		fmt.Printf("notify msg: %s\n", msg)
 
 		switch msgType {
 		case "image":
 			return msg.ReplyImage(msg.GetString("MediaId"))
 		case "voice":
 			return msg.ReplyVoice(msg.GetString("MediaId"))
-		case "video":
-			return msg.ReplyVideo(msg.GetString("MediaId"), "video title", "about this video")
 		case "link":
 			return msg.ReplyNews(msg.GetString("Title"), msg.GetString("Description"), msg.GetString("Url"), "")
 		}
 
-		return msg.ReplyText("wxmp" + msg.String())
+		return msg.ReplyText(msg.String())
 	})
-	fmt.Printf("msg notify listen error: %v", err)
+
+	log.Printf("msg notify listen error: %v", err)
 }
 
-func getIns() *wxmp.Instance {
-	opts := &wxmp.Options{
-		Appid:          "xxx",
-		Secret:         "xxx",
-		VerifyToken:    "xxx",
-		EncodingAesKey: "xxx",
+func getServer() *wxmp.Server {
+	server, err := wxmp.NewServer(&wxmp.Options{
+		VerifyToken:    verifyToken,
+		EncodingAesKey: encodingAesKey,
 		Debug:          true,
-	}
-
-	ins, err := wxmp.New(opts)
+	})
 
 	if err != nil {
-		panic(err)
+		log.Fatalf("new wxmp server failed: %v\n", err)
 	}
 
-	return ins
+	return server
 }
