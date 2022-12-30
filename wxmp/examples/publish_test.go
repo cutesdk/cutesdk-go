@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleGetPublishList() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/freepublish/batchget"
 	params := map[string]interface{}{
@@ -15,7 +15,7 @@ func ExampleGetPublishList() {
 		"no_content": 1,
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

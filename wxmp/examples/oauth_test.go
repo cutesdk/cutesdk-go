@@ -6,13 +6,17 @@ import (
 )
 
 func ExampleGetOauthUrl() {
-	client := getClient()
+	cli := getClient()
 
-	redirectUri := "https://www.xxx.com/api/callback/"
+	redirectUri := "https://xxx.com/api/callback/"
 	scope := "snsapi_userinfo"
 	state := "test123"
+	extra := map[string]string{
+		"forcePopup":    "false",
+		"forceSnapShot": "false",
+	}
 
-	oauthUrl, err := client.GetOauthUrl(redirectUri, scope, state)
+	oauthUrl, err := cli.GetOauthUrl(redirectUri, scope, state, extra)
 	if err != nil {
 		log.Fatalf("get oauth url failed: %v\n", err)
 	}
@@ -22,11 +26,11 @@ func ExampleGetOauthUrl() {
 }
 
 func ExampleGetOauthToken() {
-	client := getClient()
+	cli := getClient()
 
 	code := "xxx"
 
-	res, err := client.GetOauthToken(code)
+	res, err := cli.GetOauthToken(code)
 	if err != nil {
 		log.Fatalf("get oauth token failed: %v\n", err)
 	}
@@ -40,12 +44,12 @@ func ExampleGetOauthToken() {
 }
 
 func ExampleGetOauthUser() {
-	client := getClient()
+	cli := getClient()
 
 	oauthAccessToken := "xxx"
 	openid := "xxx"
 
-	res, err := client.GetOauthUser(oauthAccessToken, openid)
+	res, err := cli.GetOauthUser(oauthAccessToken, openid)
 	if err != nil {
 		log.Fatalf("get oauth user failed: %v\n", err)
 	}

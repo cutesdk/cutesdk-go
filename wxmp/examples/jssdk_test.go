@@ -7,11 +7,11 @@ import (
 )
 
 func ExampleGetJssdkConfig() {
-	client := getClient()
+	cli := getClient()
 
 	url := "https://xxx.com?p=123"
 
-	res, err := client.GetJssdkConfig(url)
+	res, err := cli.GetJssdkConfig(url)
 
 	if err != nil {
 		log.Fatalf("get jssdk config failed: %v", err)

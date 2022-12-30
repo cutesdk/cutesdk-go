@@ -5,21 +5,21 @@ import (
 	"time"
 )
 
-// ComponentAccessToken: default component_access_token handler
-type ComponentAccessToken struct {
-	ins *Instance
+// AccessToken: default component_access_token handler
+type AccessToken struct {
+	cli *Client
 }
 
-// NewComponentAccessToken: init component_access_token handler
-func NewComponentAccessToken(ins *Instance) *ComponentAccessToken {
-	return &ComponentAccessToken{ins}
+// NewAccessToken: init component_access_token handler
+func NewAccessToken(cli *Client) *AccessToken {
+	return &AccessToken{cli}
 }
 
 // GetToken: get component_access_token, from cache or api
-func (t *ComponentAccessToken) GetToken() (string, error) {
-	cacheKey := t.ins.GetComponentAccessTokenCacheKey()
+func (t *AccessToken) GetToken() (string, error) {
+	cacheKey := t.cli.GetAccessTokenCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// get component_access_token from cache
 	if v, err := cache.Get(cacheKey); err == nil && v != nil {
@@ -33,13 +33,13 @@ func (t *ComponentAccessToken) GetToken() (string, error) {
 }
 
 // RefreshToken: refresh component_access_token
-func (t *ComponentAccessToken) RefreshToken() (string, error) {
-	cacheKey := t.ins.GetComponentAccessTokenCacheKey()
+func (t *AccessToken) RefreshToken() (string, error) {
+	cacheKey := t.cli.GetAccessTokenCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// get component_access_token from api
-	res, err := t.ins.FetchComponentAccessToken()
+	res, err := t.cli.FetchAccessToken()
 	if err != nil {
 		return "", fmt.Errorf("fetch token failed: %v", err)
 	}
@@ -59,10 +59,10 @@ func (t *ComponentAccessToken) RefreshToken() (string, error) {
 }
 
 // SetToken: set component_access_token to cache
-func (t *ComponentAccessToken) SetToken(token string, expire time.Duration) error {
-	cacheKey := t.ins.GetComponentAccessTokenCacheKey()
+func (t *AccessToken) SetToken(token string, expire time.Duration) error {
+	cacheKey := t.cli.GetAccessTokenCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// set component_access_token to cache
 	return cache.Set(cacheKey, token, expire)

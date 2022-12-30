@@ -9,7 +9,7 @@ import (
 )
 
 func ExampleCreateQrcode() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/qrcode/create"
 	params := map[string]interface{}{
@@ -22,7 +22,7 @@ func ExampleCreateQrcode() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

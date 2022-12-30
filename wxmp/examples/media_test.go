@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleGetMediaList() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/material/batchget_material"
 	params := map[string]interface{}{
@@ -15,7 +15,7 @@ func ExampleGetMediaList() {
 		"count":  20,
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -29,12 +29,12 @@ func ExampleGetMediaList() {
 }
 
 func ExampleUploadTempMedia() {
-	client := getClient()
+	cli := getClient()
 
 	mediaType := "image"
 	filePath := "./qrcode.jpg"
 
-	res, err := client.UploadTempMedia(mediaType, filePath)
+	res, err := cli.UploadTempMedia(mediaType, filePath)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -48,14 +48,14 @@ func ExampleUploadTempMedia() {
 }
 
 func ExampleUploadMedia() {
-	client := getClient()
+	cli := getClient()
 
 	mediaType := "video"
 	filePath := "./video.mp4"
 	extra := map[string]interface{}{
 		"description": `{"title":"video title", "introduction":"video intro"}`,
 	}
-	res, err := client.UploadMedia(mediaType, filePath, extra)
+	res, err := cli.UploadMedia(mediaType, filePath, extra)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -69,10 +69,10 @@ func ExampleUploadMedia() {
 }
 
 func ExampleUploadImage() {
-	client := getClient()
+	cli := getClient()
 
 	filePath := "./qrcode.jpg"
-	res, err := client.UploadImage(filePath)
+	res, err := cli.UploadImage(filePath)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

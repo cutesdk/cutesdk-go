@@ -6,15 +6,15 @@ import (
 )
 
 func ExampleCheckMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/api/json/security/MsgSecCheck"
 	params := map[string]interface{}{
-		"appid":   client.GetAppid(),
+		"appid":   cli.GetAppid(),
 		"content": "hello",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

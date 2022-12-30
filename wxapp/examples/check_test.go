@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleCheckMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/wxa/msg_sec_check"
 	params := map[string]interface{}{
@@ -16,7 +16,7 @@ func ExampleCheckMsg() {
 		"openid":  "xxx",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

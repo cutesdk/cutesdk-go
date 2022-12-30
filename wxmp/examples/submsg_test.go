@@ -7,7 +7,7 @@ import (
 )
 
 func ExampleSendSubmsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/subscribe/bizsend"
 	params := map[string]interface{}{
@@ -31,7 +31,7 @@ func ExampleSendSubmsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

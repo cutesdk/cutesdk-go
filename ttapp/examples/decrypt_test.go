@@ -6,13 +6,13 @@ import (
 )
 
 func ExampleDecryptUserInfo() {
-	client := getClient()
+	cli := getClient()
 
 	sessionKey := "xxx"
 	encryptedData := "xxx"
 	iv := "xxx"
 
-	res, err := client.DecryptUserInfo(sessionKey, encryptedData, iv)
+	res, err := cli.DecryptUserInfo(sessionKey, encryptedData, iv)
 	if err != nil {
 		log.Fatalf("decrypt user info failed: %v\n", err)
 	}

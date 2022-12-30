@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleSendTplmsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/template/send"
 	params := map[string]interface{}{
@@ -32,7 +32,7 @@ func ExampleSendTplmsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

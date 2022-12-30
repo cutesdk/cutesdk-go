@@ -18,11 +18,11 @@ func ExampleNewClient() {
 }
 
 func getClient() *qqapp.Client {
-	client, _ := qqapp.NewClient(&qqapp.Options{
+	cli, _ := qqapp.NewClient(&qqapp.Options{
 		Debug:  true,
 		Appid:  appid,
 		Secret: secret,
 	})
 
-	return client
+	return cli
 }

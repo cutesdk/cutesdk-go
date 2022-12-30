@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleGetUserPhone() {
-	client := getClient()
+	cli := getClient()
 
 	code := "xxx"
 
@@ -15,7 +15,7 @@ func ExampleGetUserPhone() {
 		"code": code,
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

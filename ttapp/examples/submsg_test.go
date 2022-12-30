@@ -6,11 +6,11 @@ import (
 )
 
 func ExampleSendSubmsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/api/apps/subscribe_notification/developer/v1/notify"
 	params := map[string]interface{}{
-		"app_id":  client.GetAppid(),
+		"app_id":  cli.GetAppid(),
 		"tpl_id":  "xxx",
 		"open_id": "xxx",
 		"data": map[string]interface{}{
@@ -20,7 +20,7 @@ func ExampleSendSubmsg() {
 		"page": "pages/index/index",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

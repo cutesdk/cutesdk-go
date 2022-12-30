@@ -43,10 +43,10 @@ func main() {
 }
 
 func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request) {
-	server := getServer()
-	client := getClient()
+	svr := getServer()
+	cli := svr.GetClient()
 
-	err := server.Listen(req, resp, func(msg *wxapp.NotifyMsg) *wxapp.ReplyMsg {
+	err := svr.Listen(req, resp, func(msg *wxapp.NotifyMsg) *wxapp.ReplyMsg {
 		log.Printf("notify msg: %s\n", msg)
 
 		msgType := msg.GetString("MsgType")
@@ -61,7 +61,7 @@ func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request)
 		openid := msg.GetString("FromUserName")
 		content := msg.String()
 
-		go sendTextMsg(client, openid, content)
+		go sendTextMsg(cli, openid, content)
 
 		return nil
 	})
@@ -69,7 +69,7 @@ func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request)
 	log.Printf("msg notify listen error: %v", err)
 }
 
-func sendTextMsg(client *wxapp.Client, openid string, content string) error {
+func sendTextMsg(cli *wxapp.Client, openid string, content string) error {
 	uri := "/cgi-bin/message/custom/send"
 	params := map[string]interface{}{
 		"touser":  openid,
@@ -79,7 +79,7 @@ func sendTextMsg(client *wxapp.Client, openid string, content string) error {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Printf("request api failed: %v\n", err)
 		return err
@@ -94,32 +94,20 @@ func sendTextMsg(client *wxapp.Client, openid string, content string) error {
 }
 
 func getServer() *wxapp.Server {
-	server, err := wxapp.NewServer(&wxapp.Options{
+	svr, err := wxapp.NewServer(&wxapp.Options{
+		Appid:          appid,
+		Secret:         secret,
 		VerifyToken:    verifyToken,
 		EncodingAesKey: encodingAesKey,
 		Debug:          true,
-	})
-
-	if err != nil {
-		log.Fatalf("new wxapp server failed: %v\n", err)
-	}
-
-	return server
-}
-
-func getClient() *wxapp.Client {
-	client, err := wxapp.NewClient(&wxapp.Options{
-		Appid:  appid,
-		Secret: secret,
-		Debug:  true,
 		Cache: &cache.FileOptions{
 			Dir: "../cache",
 		},
 	})
 
 	if err != nil {
-		log.Fatalf("new wxapp client failed: %v\n", err)
+		log.Fatalf("new wxapp server failed: %v\n", err)
 	}
 
-	return client
+	return svr
 }

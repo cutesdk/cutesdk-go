@@ -1,4 +1,4 @@
-package wxmp
+package wxopen
 
 import (
 	"fmt"
@@ -11,18 +11,20 @@ import (
 	"github.com/idoubi/goz"
 )
 
-// Client: wxmp client
+// Client: wxopen client
 type Client struct {
-	opts                *Options
-	requestClient       *request.Client
-	cacheHandler        cache.ICache
-	accessTokenCacheKey string
-	accessTokenHandler  token.IToken
-	jsapiTicketCacheKey string
-	jsapiTicketHandler  token.IToken
+	opts                    *Options
+	requestClient           *request.Client
+	cacheHandler            cache.ICache
+	verifyTicketCacheKey    string
+	verifyTicketHandler     token.IToken
+	accessTokenCacheKey     string
+	accessTokenHandler      token.IToken
+	authorizerTokenCacheKey string
+	authorizerTokenHandler  token.IToken
 }
 
-// NewClient: new wxmp client
+// NewClient: new wxopen client
 func NewClient(opts *Options) (*Client, error) {
 	// set default options
 	if opts.Timeout <= 0 {
@@ -54,51 +56,66 @@ func NewClient(opts *Options) (*Client, error) {
 		Timeout: opts.Timeout,
 	})
 
-	// set default access_token cache key
-	accessTokenCacheKey := fmt.Sprintf("wxmp.access_token.%s", cli.GetAppid())
+	// set default component_access_token cache key
+	accessTokenCacheKey := fmt.Sprintf("wxopen.component_access_token.%s", cli.GetAppid())
 	cli.SetAccessTokenCacheKey(accessTokenCacheKey)
 
-	// set default access_token handler
+	// set default component_access_token handler
 	cli.SetAccessTokenHandler(NewAccessToken(cli))
 
-	// set default jsapi_ticket cache key
-	jsapiTicketCacheKey := fmt.Sprintf("wxmp.jsapi_ticket.%s", cli.GetAppid())
-	cli.SetJsapiTicketCacheKey(jsapiTicketCacheKey)
+	// set default component_verify_ticket cache key
+	verifyTicketCacheKey := fmt.Sprintf("wxopen.component_verify_ticket.%s", cli.GetAppid())
+	cli.SetVerifyTicketCacheKey(verifyTicketCacheKey)
 
-	// set default jsapi_ticket handler
-	cli.SetJsapiTicketHandler(NewJsapiTicket(cli))
+	// set default component_verify_ticket handler
+	cli.SetVerifyTicketHandler(NewVerifyTicket(cli))
 
 	return cli, nil
 }
 
-// GetAccessToken: get access_token from cache or api
+// GetVerifyTicket: get component_verify_ticket from cache
+func (cli *Client) GetVerifyTicket() (string, error) {
+	return cli.GetVerifyTicketHandler().GetToken()
+}
+
+// RefreshVerifyTicket: refresh component_verify_ticket
+func (cli *Client) RefreshVerifyTicket() (string, error) {
+	return cli.GetVerifyTicketHandler().RefreshToken()
+}
+
+// SetVerifyTicket: set component_verify_ticket
+func (cli *Client) SetVerifyTicket(token string, expire time.Duration) error {
+	return cli.GetVerifyTicketHandler().SetToken(token, expire)
+}
+
+// GetAccessToken: get component_access_token from cache or api
 func (cli *Client) GetAccessToken() (string, error) {
 	return cli.GetAccessTokenHandler().GetToken()
 }
 
-// RefreshAccessToken: refresh access_token
+// RefreshAccessToken: refresh component_access_token
 func (cli *Client) RefreshAccessToken() (string, error) {
 	return cli.GetAccessTokenHandler().RefreshToken()
 }
 
-// SetAccessToken: set access_token
+// SetAccessToken: set component_access_token
 func (cli *Client) SetAccessToken(token string, expire time.Duration) error {
 	return cli.GetAccessTokenHandler().SetToken(token, expire)
 }
 
-// GetJsapiTicket: get jsapi_ticket from cache or api
-func (cli *Client) GetJsapiTicket() (string, error) {
-	return cli.GetJsapiTicketHandler().GetToken()
+// GetAuthorizerToken: get authorizer_access_token from cache or api
+func (cli *Client) GetAuthorizerToken() (string, error) {
+	return cli.GetAuthorizerTokenHandler().GetToken()
 }
 
-// RefreshJsapiTicket: refresh jsapi_ticket
-func (cli *Client) RefreshJsapiTicket() (string, error) {
-	return cli.GetJsapiTicketHandler().RefreshToken()
+// RefreshAuthorizerToken: refresh authorizer_access_token
+func (cli *Client) RefreshAuthorizerToken() (string, error) {
+	return cli.GetAuthorizerTokenHandler().RefreshToken()
 }
 
-// SetJsapiTicket: set jsapi_ticket
-func (cli *Client) SetJsapiTicket(token string, expire time.Duration) error {
-	return cli.GetJsapiTicketHandler().SetToken(token, expire)
+// SetAuthorizerToken: set authorizer_access_token
+func (cli *Client) SetAuthorizerToken(token string, expire time.Duration) error {
+	return cli.GetAuthorizerTokenHandler().SetToken(token, expire)
 }
 
 // Get: request api with get method
@@ -109,11 +126,6 @@ func (cli *Client) Get(uri string, args ...map[string]interface{}) (*request.Res
 // Post: request api with post method
 func (cli *Client) Post(uri string, args ...map[string]interface{}) (*request.Result, error) {
 	return cli.GetRequestClient().Post(uri, args...)
-}
-
-// PostMultipart: request api with post method
-func (cli *Client) PostMultipart(uri string, args ...map[string]interface{}) (*request.Result, error) {
-	return cli.GetRequestClient().PostMultipart(uri, args...)
 }
 
 // Request: request api
@@ -162,16 +174,6 @@ func (cli *Client) PostWithToken(uri string, args ...map[string]interface{}) (*r
 	return cli.Post(uri, args...)
 }
 
-// PostMultipartWithToken: request api with post method, auto get access_token
-func (cli *Client) PostMultipartWithToken(uri string, args ...map[string]interface{}) (*request.Result, error) {
-	uri, err := cli.AppendAccessTokenToUri(uri)
-	if err != nil {
-		return nil, err
-	}
-
-	return cli.PostMultipart(uri, args...)
-}
-
 // GetRequestClient: get request handler
 func (cli *Client) GetRequestClient() *request.Client {
 	return cli.requestClient
@@ -189,50 +191,74 @@ func (cli *Client) SetCacheHandler(handler cache.ICache) error {
 	return nil
 }
 
-// GetAccessTokenCacheKey: get access_token cache key
+// GetVerifyTicketCacheKey: get component_verify_ticket cache key
+func (cli *Client) GetVerifyTicketCacheKey() string {
+	return cli.verifyTicketCacheKey
+}
+
+// SetVerifyTicketCacheKey: set component_verify_ticket cache key
+func (cli *Client) SetVerifyTicketCacheKey(cacheKey string) error {
+	cli.verifyTicketCacheKey = cacheKey
+
+	return nil
+}
+
+// GetVerifyTicketHandler: get component_verify_ticket handler
+func (cli *Client) GetVerifyTicketHandler() token.IToken {
+	return cli.verifyTicketHandler
+}
+
+// SetVerifyTicketHandler: set component_verify_ticket handler
+func (cli *Client) SetVerifyTicketHandler(handler token.IToken) error {
+	cli.verifyTicketHandler = handler
+
+	return nil
+}
+
+// GetAccessTokenCacheKey: get component_access_token cache key
 func (cli *Client) GetAccessTokenCacheKey() string {
 	return cli.accessTokenCacheKey
 }
 
-// SetAccessTokenCacheKey: set access_token cache key
+// SetAccessTokenCacheKey: set component_access_token cache key
 func (cli *Client) SetAccessTokenCacheKey(cacheKey string) error {
 	cli.accessTokenCacheKey = cacheKey
 
 	return nil
 }
 
-// GetAccessTokenHandler: get access_token handler
+// GetAccessTokenHandler: get component_access_token handler
 func (cli *Client) GetAccessTokenHandler() token.IToken {
 	return cli.accessTokenHandler
 }
 
-// SetAccessTokenHandler: set access_token handler
+// SetAccessTokenHandler: set component_access_token handler
 func (cli *Client) SetAccessTokenHandler(handler token.IToken) error {
 	cli.accessTokenHandler = handler
 
 	return nil
 }
 
-// GetJsapiTicketCacheKey: get jsapi_ticket cache key
-func (cli *Client) GetJsapiTicketCacheKey() string {
-	return cli.jsapiTicketCacheKey
+// GetAuthorizerTokenCacheKey: get authorizer_access_token cache key
+func (cli *Client) GetAuthorizerTokenCacheKey() string {
+	return cli.authorizerTokenCacheKey
 }
 
-// SetJsapiTicketCacheKey: set jsapi_ticket cache key
-func (cli *Client) SetJsapiTicketCacheKey(cacheKey string) error {
-	cli.jsapiTicketCacheKey = cacheKey
+// SetAuthorizerTokenCacheKey: set authorizer_access_token cache key
+func (cli *Client) SetAuthorizerTokenCacheKey(cacheKey string) error {
+	cli.authorizerTokenCacheKey = cacheKey
 
 	return nil
 }
 
-// GetJsapiTicketHandler: get jsapi_ticket handler
-func (cli *Client) GetJsapiTicketHandler() token.IToken {
-	return cli.jsapiTicketHandler
+// GetAuthorizerTokenHandler: get authorizer_access_token handler
+func (cli *Client) GetAuthorizerTokenHandler() token.IToken {
+	return cli.authorizerTokenHandler
 }
 
-// SetJsapiTicketHandler: set jsapi_ticket handler
-func (cli *Client) SetJsapiTicketHandler(handler token.IToken) error {
-	cli.jsapiTicketHandler = handler
+// SetAuthorizerTokenHandler: set authorizer_access_token handler
+func (cli *Client) SetAuthorizerTokenHandler(handler token.IToken) error {
+	cli.authorizerTokenHandler = handler
 
 	return nil
 }
@@ -242,12 +268,12 @@ func (cli *Client) GetOptions() *Options {
 	return cli.opts
 }
 
-// GetAppid: get appid
+// GetAppid: get component_appid
 func (cli *Client) GetAppid() string {
 	return cli.opts.Appid
 }
 
-// GetSecret: get secret
+// GetSecret get component_appsecret
 func (cli *Client) GetSecret() string {
 	return cli.opts.Secret
 }

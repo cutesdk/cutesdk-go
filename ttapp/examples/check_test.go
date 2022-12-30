@@ -6,9 +6,9 @@ import (
 )
 
 func ExampleCheckMsg() {
-	client := getClient()
+	cli := getClient()
 
-	accessToken, err := client.GetAccessToken()
+	accessToken, err := cli.GetAccessToken()
 	if err != nil {
 		log.Fatalf("get access_token failed: %v\n", err)
 	}
@@ -23,7 +23,7 @@ func ExampleCheckMsg() {
 		"X-Token": accessToken,
 	}
 
-	res, err := client.Post(uri, params, headers)
+	res, err := cli.Post(uri, params, headers)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

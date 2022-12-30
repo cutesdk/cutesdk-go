@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleSendSubmsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/subscribe/send"
 	params := map[string]interface{}{
@@ -25,7 +25,7 @@ func ExampleSendSubmsg() {
 		"lang":              "zh_CN",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

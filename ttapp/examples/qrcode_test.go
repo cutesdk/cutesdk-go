@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleCreateQrcode() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/api/apps/qrcode"
 	params := map[string]interface{}{
@@ -14,7 +14,7 @@ func ExampleCreateQrcode() {
 		"path":    "",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

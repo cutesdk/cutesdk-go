@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleCreateQrcode() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/wxa/getwxacodeunlimit"
 	params := map[string]interface{}{
@@ -16,7 +16,7 @@ func ExampleCreateQrcode() {
 		"env_version": "develop",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

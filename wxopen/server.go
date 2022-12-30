@@ -1,16 +1,16 @@
-package wxapp
+package wxopen
 
 import (
 	"github.com/idoubi/goutils/crypt"
 )
 
-// Server: wxapp server
+// Server: wxopen server
 type Server struct {
 	opts *Options
 	cli  *Client
 }
 
-// NewServer: new wxapp server
+// NewServer: new wxopen server
 func NewServer(opts *Options) (*Server, error) {
 	cli, err := NewClient(opts)
 	if err != nil {

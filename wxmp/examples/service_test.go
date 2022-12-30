@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleSendTextMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/custom/send"
 	params := map[string]interface{}{
@@ -17,7 +17,7 @@ func ExampleSendTextMsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -31,7 +31,7 @@ func ExampleSendTextMsg() {
 }
 
 func ExampleSendImageMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/custom/send"
 	params := map[string]interface{}{
@@ -42,7 +42,7 @@ func ExampleSendImageMsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -56,7 +56,7 @@ func ExampleSendImageMsg() {
 }
 
 func ExampleSendVideoMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/custom/send"
 	params := map[string]interface{}{
@@ -70,7 +70,7 @@ func ExampleSendVideoMsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -84,7 +84,7 @@ func ExampleSendVideoMsg() {
 }
 
 func ExampleSendNewsMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/custom/send"
 	params := map[string]interface{}{
@@ -102,7 +102,7 @@ func ExampleSendNewsMsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -116,7 +116,7 @@ func ExampleSendNewsMsg() {
 }
 
 func ExampleSendMenuMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/custom/send"
 	params := map[string]interface{}{
@@ -138,7 +138,7 @@ func ExampleSendMenuMsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -152,7 +152,7 @@ func ExampleSendMenuMsg() {
 }
 
 func ExampleSendMiniprogramMsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/message/custom/send"
 	params := map[string]interface{}{
@@ -166,7 +166,7 @@ func ExampleSendMiniprogramMsg() {
 		},
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

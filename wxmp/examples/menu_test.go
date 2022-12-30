@@ -6,11 +6,11 @@ import (
 )
 
 func ExampleGetCurrentMenu() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/get_current_selfmenu_info"
 
-	res, err := client.GetWithToken(uri)
+	res, err := cli.GetWithToken(uri)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

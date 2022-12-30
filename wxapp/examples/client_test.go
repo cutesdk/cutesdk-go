@@ -18,11 +18,11 @@ func ExampleNewClient() {
 }
 
 func getClient() *wxapp.Client {
-	client, _ := wxapp.NewClient(&wxapp.Options{
+	cli, _ := wxapp.NewClient(&wxapp.Options{
 		Debug:  true,
 		Appid:  appid,
 		Secret: secret,
 	})
 
-	return client
+	return cli
 }

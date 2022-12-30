@@ -6,19 +6,11 @@ import (
 )
 
 func ExampleCode2Session() {
-	client := getClient()
+	cli := getClient()
 
 	code := "xxx"
 
-	uri := "/sns/jscode2session"
-	params := map[string]interface{}{
-		"appid":      client.GetAppid(),
-		"secret":     client.GetSecret(),
-		"js_code":    code,
-		"grant_type": "authorization_code",
-	}
-
-	res, err := client.Get(uri, params)
+	res, err := cli.Login(code)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

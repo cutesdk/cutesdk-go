@@ -6,7 +6,7 @@ import (
 )
 
 func ExampleSendSubmsg() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/api/json/subscribe/SendSubscriptionMessage"
 	params := map[string]interface{}{
@@ -24,7 +24,7 @@ func ExampleSendSubmsg() {
 		"page":             "pages/index/index",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

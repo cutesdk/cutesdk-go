@@ -6,11 +6,11 @@ import (
 )
 
 func ExampleGetTags() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/tags/get"
 
-	res, err := client.GetWithToken(uri)
+	res, err := cli.GetWithToken(uri)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -24,14 +24,14 @@ func ExampleGetTags() {
 }
 
 func ExampleGetUserOpenids() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/user/get"
 	params := map[string]interface{}{
 		"next_openid": "",
 	}
 
-	res, err := client.GetWithToken(uri, params)
+	res, err := cli.GetWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
@@ -45,14 +45,14 @@ func ExampleGetUserOpenids() {
 }
 
 func ExampleGetUserInfo() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/cgi-bin/user/info"
 	params := map[string]interface{}{
 		"openid": "xxx",
 	}
 
-	res, err := client.GetWithToken(uri, params)
+	res, err := cli.GetWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

@@ -34,7 +34,7 @@ func NewClient(opts *Options) (*Client, error) {
 	}
 
 	// new client
-	client := &Client{opts: opts}
+	cli := &Client{opts: opts}
 
 	// new cache handler
 	cacheHandler, err := cache.NewCache(opts.Cache)
@@ -43,23 +43,23 @@ func NewClient(opts *Options) (*Client, error) {
 	}
 
 	// set cache handler
-	client.SetCacheHandler(cacheHandler)
+	cli.SetCacheHandler(cacheHandler)
 
 	// set request client
-	client.requestClient = request.NewClient(&request.Options{
+	cli.requestClient = request.NewClient(&request.Options{
 		BaseUri: "https://developer.toutiao.com",
 		Debug:   opts.Debug,
 		Timeout: opts.Timeout,
 	})
 
 	// set default access_token cache key
-	accessTokenCacheKey := fmt.Sprintf("ttapp.access_token.%s", client.GetAppid())
-	client.SetAccessTokenCacheKey(accessTokenCacheKey)
+	accessTokenCacheKey := fmt.Sprintf("ttapp.access_token.%s", cli.GetAppid())
+	cli.SetAccessTokenCacheKey(accessTokenCacheKey)
 
 	// set default access_token handler
-	client.SetAccessTokenHandler(NewAccessToken(client))
+	cli.SetAccessTokenHandler(NewAccessToken(cli))
 
-	return client, nil
+	return cli, nil
 }
 
 // GetAccessToken: get access_token from cache or api

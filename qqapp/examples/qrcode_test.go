@@ -6,15 +6,15 @@ import (
 )
 
 func ExampleCreateQrcode() {
-	client := getClient()
+	cli := getClient()
 
 	uri := "/api/json/qqa/CreateMiniCode"
 	params := map[string]interface{}{
-		"appid": client.GetAppid(),
+		"appid": cli.GetAppid(),
 		"path":  "pages/index/index",
 	}
 
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

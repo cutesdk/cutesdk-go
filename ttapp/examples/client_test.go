@@ -18,11 +18,11 @@ func ExampleNewClient() {
 }
 
 func getClient() *ttapp.Client {
-	client, _ := ttapp.NewClient(&ttapp.Options{
+	cli, _ := ttapp.NewClient(&ttapp.Options{
 		Debug:  true,
 		Appid:  appid,
 		Secret: secret,
 	})
 
-	return client
+	return cli
 }
