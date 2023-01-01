@@ -1,6 +1,7 @@
 package wxpay
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/idoubi/goutils"
@@ -17,21 +18,7 @@ type PayParams struct {
 }
 
 // GetPayParams: get pay params
-func (ins *Instance) GetPayParams(params map[string]interface{}) (*PayParams, error) {
-	if params == nil {
-		return nil, fmt.Errorf("invalid params")
-	}
-
-	prepayId := ""
-	signType := "MD5"
-
-	if v, ok := params["prepay_id"]; ok {
-		prepayId = v.(string)
-	}
-	if v, ok := params["sign_type"]; ok {
-		signType = v.(string)
-	}
-
+func (cli *Client) GetPayParams(appid, prepayId, signType string) (*PayParams, error) {
 	if prepayId == "" {
 		return nil, fmt.Errorf("invalid prepay_id")
 	}
@@ -39,12 +26,11 @@ func (ins *Instance) GetPayParams(params map[string]interface{}) (*PayParams, er
 		return nil, fmt.Errorf("invalid sign_type")
 	}
 
-	appid := ins.opts.Appid
 	nonce := goutils.NonceStr(32)
 	timestamp := goutils.TimestampStr()
 	_package := fmt.Sprintf("prepay_id=%s", prepayId)
 
-	payParams := map[string]interface{}{
+	params := map[string]interface{}{
 		"appId":     appid,
 		"nonceStr":  nonce,
 		"timeStamp": timestamp,
@@ -55,19 +41,25 @@ func (ins *Instance) GetPayParams(params map[string]interface{}) (*PayParams, er
 	var sign string
 
 	if signType == "HMAC-SHA256" {
-		sign = SignWithHmacSha256(payParams, ins.opts.ApiKey)
+		sign = SignWithHmacSha256(params, cli.opts.ApiKey)
 	} else {
-		sign = SignWithMd5(payParams, ins.opts.ApiKey)
+		sign = SignWithMd5(params, cli.opts.ApiKey)
 	}
 
-	payParams["paySign"] = sign
-
-	return &PayParams{
+	payParams := &PayParams{
 		Appid:     appid,
 		NonceStr:  nonce,
 		Timestamp: timestamp,
 		Package:   _package,
 		SignType:  signType,
 		PaySign:   sign,
-	}, nil
+	}
+
+	return payParams, nil
+}
+
+func (p *PayParams) String() string {
+	b, _ := json.Marshal(p)
+
+	return string(b)
 }

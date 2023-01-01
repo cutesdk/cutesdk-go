@@ -17,7 +17,7 @@ import (
 
 func main() {
 	// new wxmp client
-	client, err := wxmp.NewClient(&wxmp.Options{
+	cli, err := wxmp.NewClient(&wxmp.Options{
 		Debug:  true,
 		Appid:  "xxx",
 		Secret: "xxx",
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// auto fetch access_token
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

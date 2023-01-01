@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/cutesdk/cutesdk-go/common/request"
+	"github.com/idoubi/goutils"
+	"github.com/idoubi/goutils/crypt"
 )
 
 // NotifyMsg: notify message type
@@ -18,15 +20,24 @@ type NotifyMsg struct {
 type NotifyHandler func(*NotifyMsg) *ReplyMsg
 
 // Listen: listen notify
-func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
-	msg, err := ins.GetNotifyMsg(req)
+func (svr *Server) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
+	msg, err := svr.GetNotifyMsg(req)
 	if err != nil {
 		return fmt.Errorf("get notify message failed: %v", err)
 	}
 
 	if msg.GetString("return_code") == "SUCCESS" {
-		if err := ins.VerifyNotifyMsg(msg); err != nil {
-			return fmt.Errorf("verify notify message failed: %v", err)
+		if reqInfo := msg.GetString("req_info"); reqInfo != "" {
+			// decrypt req_info
+			decryptMsg, err := svr.DecryptReqInfo(reqInfo)
+			if err != nil {
+				return fmt.Errorf("decrypt req_info failed: %v", err)
+			}
+			msg = decryptMsg
+		} else {
+			if err := svr.VerifyNotifyMsg(msg); err != nil {
+				return fmt.Errorf("verify notify message failed: %v", err)
+			}
 		}
 	}
 
@@ -40,11 +51,11 @@ func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyH
 		return nil
 	}
 
-	return ins.ReplyMessage(resp, replyMsg)
+	return svr.ReplyMessage(resp, replyMsg)
 }
 
 // GetReqBody: get request data in body
-func (ins *Instance) GetReqBody(req *http.Request) ([]byte, error) {
+func (svr *Server) GetReqBody(req *http.Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return nil, fmt.Errorf("invalid notify data: %v", err)
@@ -55,7 +66,7 @@ func (ins *Instance) GetReqBody(req *http.Request) ([]byte, error) {
 }
 
 // VerifyNotifyMsg: verify notify message
-func (ins *Instance) VerifyNotifyMsg(msg *NotifyMsg) error {
+func (svr *Server) VerifyNotifyMsg(msg *NotifyMsg) error {
 	sign := msg.GetString("sign")
 	if sign == "" {
 		return fmt.Errorf("invalid sign")
@@ -76,13 +87,13 @@ func (ins *Instance) VerifyNotifyMsg(msg *NotifyMsg) error {
 	}
 
 	if signType == "MD5" {
-		if calSign := SignWithMd5(params, ins.opts.ApiKey); calSign != sign {
+		if calSign := SignWithMd5(params, svr.opts.ApiKey); calSign != sign {
 			return fmt.Errorf("invalid sign")
 		}
 	}
 
 	if signType == "HMAC-SHA256" {
-		if sign != SignWithHmacSha256(params, ins.opts.ApiKey) {
+		if sign != SignWithHmacSha256(params, svr.opts.ApiKey) {
 			return fmt.Errorf("invalid sign")
 		}
 	}
@@ -90,9 +101,42 @@ func (ins *Instance) VerifyNotifyMsg(msg *NotifyMsg) error {
 	return nil
 }
 
+// DecryptReqInfo: decrypt req_info
+func (svr *Server) DecryptReqInfo(reqInfo string) (*NotifyMsg, error) {
+	reqInfoB := goutils.Base64Decode(reqInfo)
+	if reqInfoB == "" {
+		return nil, fmt.Errorf("invalid req_info: %s", reqInfo)
+	}
+
+	md5ApiKey := goutils.MD5(svr.opts.ApiKey)
+
+	info, err := crypt.AesEcbDecrypt([]byte(reqInfoB), []byte(md5ApiKey))
+	if err != nil {
+		return nil, err
+	}
+
+	beginTag := []byte("<root>")
+	endTag := []byte("</root>")
+	if !bytes.HasPrefix(info, beginTag) || !bytes.HasSuffix(info, endTag) {
+		return nil, fmt.Errorf("decrpyt req_info failed: %s", info)
+	}
+
+	info = bytes.Replace(info, beginTag, []byte("<xml>"), 1)
+	info = bytes.Replace(info, endTag, []byte("</xml>"), 1)
+
+	res := request.NewResult(info)
+	res.XmlParsed()
+
+	notifyMsg := &NotifyMsg{
+		res,
+	}
+
+	return notifyMsg, nil
+}
+
 // GetNotifyMsg: get notify message
-func (ins *Instance) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
-	reqBody, err := ins.GetReqBody(req)
+func (svr *Server) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
+	reqBody, err := svr.GetReqBody(req)
 	if err != nil {
 		return nil, err
 	}

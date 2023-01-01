@@ -17,7 +17,7 @@ import (
 
 func main() {
 	// new qqapp client
-	client, err := qqapp.NewClient(&qqapp.Options{
+	cli, err := qqapp.NewClient(&qqapp.Options{
 		Debug:  true,
 		Appid:  "xxx",
 		Secret: "xxx",
@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// auto fetch access_token
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}

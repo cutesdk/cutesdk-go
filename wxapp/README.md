@@ -17,7 +17,7 @@ import (
 
 func main() {
 	// new wxapp client
-	client, err := wxapp.NewClient(&wxapp.Options{
+	cli, err := wxapp.NewClient(&wxapp.Options{
 		Debug:  true,
 		Appid:  "xxx",
 		Secret: "xxx",
@@ -36,7 +36,7 @@ func main() {
 	}
 
 	// auto fetch access_token
-	res, err := client.PostWithToken(uri, params)
+	res, err := cli.PostWithToken(uri, params)
 	if err != nil {
 		log.Fatalf("request api failed: %v\n", err)
 	}
