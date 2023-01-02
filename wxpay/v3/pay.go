@@ -1,6 +1,7 @@
 package wxpay
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/idoubi/goutils"
@@ -16,40 +17,33 @@ type PayParams struct {
 	PaySign   string `json:"paySign"`
 }
 
+// String: output as string
+func (p *PayParams) String() string {
+	b, _ := json.Marshal(p)
+
+	return string(b)
+}
+
 // GetPayParams: get pay params
-func (ins *Instance) GetPayParams(params map[string]interface{}) (*PayParams, error) {
-	if params == nil {
-		return nil, fmt.Errorf("invalid params")
-	}
-
-	prepayId := ""
-	signType := "RSA"
-
-	if v, ok := params["prepay_id"]; ok {
-		prepayId = v.(string)
-	}
-
-	if prepayId == "" {
-		return nil, fmt.Errorf("invalid prepay_id")
-	}
-
-	appid := ins.opts.Appid
+func (cli *Client) GetPayParams(appid, prepayId, signType string) (*PayParams, error) {
 	nonce := goutils.NonceStr(32)
 	timestamp := goutils.TimestampStr()
 	_package := fmt.Sprintf("prepay_id=%s", prepayId)
 
 	str := fmt.Sprintf("%s\n%s\n%s\n%s\n", appid, timestamp, nonce, _package)
-	sign, err := ins.payClient.Sign(ins.ctx, str)
+	sign, err := cli.payClient.Sign(cli.ctx, str)
 	if err != nil {
 		return nil, err
 	}
 
-	return &PayParams{
+	payParams := &PayParams{
 		Appid:     appid,
 		NonceStr:  nonce,
 		Timestamp: timestamp,
 		Package:   _package,
 		SignType:  signType,
 		PaySign:   sign.Signature,
-	}, nil
+	}
+
+	return payParams, nil
 }

@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/cutesdk/cutesdk-go/wxpay/v2"
+	"github.com/cutesdk/cutesdk-go/wxpay/v3"
 )
 
 var (
 	mchId    string
 	apiKey   string
-	certPath string
-	keyPath  string
-	certPem  string
+	serialNo string
 	keyPem   string
+	keyPath  string
 	appid    string
 )
 
@@ -27,10 +26,9 @@ func getClient() *wxpay.Client {
 	cli, err := wxpay.NewClient(&wxpay.Options{
 		MchId:    mchId,
 		ApiKey:   apiKey,
-		CertPath: certPath,
-		KeyPath:  keyPath,
-		CertPem:  certPem,
+		SerialNo: serialNo,
 		KeyPem:   keyPem,
+		KeyPath:  keyPath,
 		Debug:    true,
 	})
 

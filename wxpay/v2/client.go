@@ -20,7 +20,7 @@ type Client struct {
 func NewClient(opts *Options) (*Client, error) {
 	// set default options
 	if opts.Timeout <= 0 {
-		opts.Timeout = 10 * time.Second
+		opts.Timeout = 30 * time.Second
 	}
 	if opts.BaseUri == "" {
 		opts.BaseUri = "https://api.mch.weixin.qq.com"
@@ -45,8 +45,8 @@ func NewClient(opts *Options) (*Client, error) {
 	}
 
 	// load cert from file path
-	if opts.CertFile != "" && opts.KeyFile != "" {
-		if crt, err := tls.LoadX509KeyPair(opts.CertFile, opts.KeyFile); err == nil {
+	if opts.CertPath != "" && opts.KeyPath != "" {
+		if crt, err := tls.LoadX509KeyPair(opts.CertPath, opts.KeyPath); err == nil {
 			certificates = append(certificates, crt)
 		}
 	}

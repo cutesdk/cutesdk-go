@@ -17,6 +17,13 @@ type PayParams struct {
 	PaySign   string `json:"paySign"`
 }
 
+// String: output as string
+func (p *PayParams) String() string {
+	b, _ := json.Marshal(p)
+
+	return string(b)
+}
+
 // GetPayParams: get pay params
 func (cli *Client) GetPayParams(appid, prepayId, signType string) (*PayParams, error) {
 	if prepayId == "" {
@@ -56,10 +63,4 @@ func (cli *Client) GetPayParams(appid, prepayId, signType string) (*PayParams, e
 	}
 
 	return payParams, nil
-}
-
-func (p *PayParams) String() string {
-	b, _ := json.Marshal(p)
-
-	return string(b)
 }

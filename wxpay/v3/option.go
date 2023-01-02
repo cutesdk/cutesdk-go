@@ -1,22 +1,18 @@
 package wxpay
 
 import (
-	"github.com/cutesdk/cutesdk-go/common/cache"
-	"github.com/cutesdk/cutesdk-go/common/request"
+	"time"
 )
 
 // Options: custom options
 type Options struct {
-	Debug          bool
-	Request        *request.Options
-	Cache          *cache.Options
-	MchId          string
-	Appid          string
-	SubMchId       string
-	SubAppid       string
-	ApiKey         string
-	SerialNo       string
-	PrivateKey     string
-	PrivateKeyPath string
-	NotifyUrl      string
+	Debug    bool
+	Timeout  time.Duration
+	BaseUri  string
+	MchId    string
+	SubMchId string
+	ApiKey   string
+	SerialNo string
+	KeyPem   string
+	KeyPath  string
 }

@@ -8,10 +8,11 @@ require (
 	github.com/tidwall/gjson v1.14.4
 )
 
-require github.com/wechatpay-apiv3/wechatpay-go v0.2.14
+require github.com/wechatpay-apiv3/wechatpay-go v0.2.16
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/liyaojian/cache v0.0.0-20220121124504-b978a1a38253
+	github.com/spf13/cast v1.5.0
 	golang.org/x/net v0.4.0 // indirect
 )

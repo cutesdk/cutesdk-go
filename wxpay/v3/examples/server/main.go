@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/cutesdk/cutesdk-go/wxpay/v2"
+	"github.com/cutesdk/cutesdk-go/wxpay/v3"
 )
 
 var (
-	mchId  = "xxx"
-	apiKey = "xxx"
+	mchId    = "xxx"
+	apiKey   = "xxx"
+	serialNo = "xxx"
+	keyPath  = "xxx"
 )
 
 type Mux struct {
@@ -43,7 +45,7 @@ func (m *Mux) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 func main() {
 	mux := new(Mux)
 
-	err := http.ListenAndServe(":8084", mux)
+	err := http.ListenAndServe(":8085", mux)
 	log.Printf("server listen: %v", err)
 }
 
@@ -51,7 +53,11 @@ func PayNotifyHandler(mchId string, resp http.ResponseWriter, req *http.Request)
 	svr := getServer()
 
 	err := svr.Listen(req, resp, func(msg *wxpay.NotifyMsg) *wxpay.ReplyMsg {
-		log.Printf("pay notify order: %s\n", msg)
+		log.Printf("v3 pay notify order: %s\n", msg)
+
+		reqData := msg.GetReqData()
+		eventType := reqData.GetString("event_type")
+		log.Printf("v3 pay event_type: %s\n", eventType)
 
 		outTradeNo := msg.GetString("out_trade_no")
 		log.Printf("order out_trade_no: %s\n", outTradeNo)
@@ -59,14 +65,18 @@ func PayNotifyHandler(mchId string, resp http.ResponseWriter, req *http.Request)
 		return msg.ReplySuccess()
 	})
 
-	log.Printf("pay notify listen error: %v", err)
+	log.Printf("v3 pay notify listen error: %v", err)
 }
 
 func RefundNotifyHandler(mchId string, resp http.ResponseWriter, req *http.Request) {
 	svr := getServer()
 
 	err := svr.Listen(req, resp, func(msg *wxpay.NotifyMsg) *wxpay.ReplyMsg {
-		log.Printf("refund notify order: %s\n", msg)
+		log.Printf("v3 refund notify order: %s\n", msg)
+
+		reqData := msg.GetReqData()
+		eventType := reqData.GetString("event_type")
+		log.Printf("v3 refund event_type: %s\n", eventType)
 
 		outRefundNo := msg.GetString("out_refund_no")
 		log.Printf("order out_refund_no: %s\n", outRefundNo)
@@ -74,13 +84,16 @@ func RefundNotifyHandler(mchId string, resp http.ResponseWriter, req *http.Reque
 		return msg.ReplySuccess()
 	})
 
-	log.Printf("refund notify listen error: %v", err)
+	log.Printf("v3 refund notify listen error: %v", err)
 }
 
 func getServer() *wxpay.Server {
 	svr, err := wxpay.NewServer(&wxpay.Options{
-		MchId:  mchId,
-		ApiKey: apiKey,
+		MchId:    mchId,
+		ApiKey:   apiKey,
+		SerialNo: serialNo,
+		KeyPath:  keyPath,
+		Debug:    true,
 	})
 
 	if err != nil {

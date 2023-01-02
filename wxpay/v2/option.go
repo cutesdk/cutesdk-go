@@ -14,6 +14,6 @@ type Options struct {
 	ApiKey   string
 	CertPem  string
 	KeyPem   string
-	CertFile string
-	KeyFile  string
+	CertPath string
+	KeyPath  string
 }

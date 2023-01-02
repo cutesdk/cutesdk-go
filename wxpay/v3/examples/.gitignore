@@ -1,0 +1,6 @@
+cache
+init_test.go
+*.http
+*.pem
+*.gzip
+*.xls
