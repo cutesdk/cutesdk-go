@@ -39,7 +39,7 @@ func ExampleRefund() {
 			"total":    3,
 			"currency": "CNY",
 		},
-		"notify_url": fmt.Sprintf("https://idoubi.cc/wxpay/v3/refund-notify/%s", cli.GetMchId()),
+		"notify_url": fmt.Sprintf("https://xxx.com/wxpay/v3/refund-notify/%s", cli.GetMchId()),
 	}
 
 	res, err := cli.Post(uri, params)

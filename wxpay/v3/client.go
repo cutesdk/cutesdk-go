@@ -71,6 +71,8 @@ func (cli *Client) newPayClient() (*core.Client, error) {
 		privateKey, err = utils.LoadPrivateKeyWithPath(opts.KeyPath)
 	}
 
+	opts.privateKey = privateKey
+
 	if err != nil {
 		return nil, fmt.Errorf("load mch key failed: %v", err)
 	}
@@ -92,7 +94,7 @@ func (cli *Client) newPayClient() (*core.Client, error) {
 	return payClient, nil
 }
 
-// WithoutValidator: not validate response data
+// WithoutValidator: create new client without validate response data
 func (cli *Client) WithoutValidator() *Client {
 	cli.payClient = core.NewClientWithValidator(cli.payClient, &validators.NullValidator{})
 
@@ -107,6 +109,11 @@ func (cli *Client) GetOptions() *Options {
 // GetMchId: get mch_id
 func (cli *Client) GetMchId() string {
 	return cli.opts.MchId
+}
+
+// GetApiKey: get api_key
+func (cli *Client) GetApiKey() string {
+	return cli.opts.ApiKey
 }
 
 // AppendParamsToUri: append params to request uri
@@ -176,29 +183,42 @@ func (cli *Client) Request(method, uri string, args ...map[string]interface{}) (
 		params = args[0]
 	}
 
-	// get method auto build url params
-	if method == http.MethodGet {
-		uri, _ = cli.AppendParamsToUri(uri, params)
+	headers := map[string]interface{}{}
+	if len(args) > 1 {
+		headers = args[1]
+	}
+
+	httpHeaders := http.Header{}
+	for k, v := range headers {
+		if k == "" || v == nil {
+			continue
+		}
+		if str, ok := v.(string); ok {
+			httpHeaders.Set(k, str)
+			continue
+		}
+		if str := cast.ToString(v); str != "" {
+			httpHeaders.Set(k, str)
+		}
 	}
 
 	if !strings.HasPrefix(uri, "http") {
 		uri = cli.opts.BaseUri + uri
 	}
 
-	// make request
-	switch method {
-	case http.MethodGet:
+	if method == http.MethodGet {
+		uri, _ = cli.AppendParamsToUri(uri, params)
 		res, err = cli.payClient.Get(cli.ctx, uri)
-	case http.MethodPost:
-		res, err = cli.payClient.Post(cli.ctx, uri, params)
-	case http.MethodPut:
-		res, err = cli.payClient.Put(cli.ctx, uri, params)
-	case http.MethodPatch:
-		res, err = cli.payClient.Patch(cli.ctx, uri, params)
-	case http.MethodDelete:
-		res, err = cli.payClient.Delete(cli.ctx, uri, params)
-	default:
-		return nil, fmt.Errorf("method: %s not support yet", method)
+	} else {
+		res, err = cli.payClient.Request(
+			cli.ctx,
+			method,
+			uri,
+			httpHeaders,
+			nil,
+			params,
+			"application/json",
+		)
 	}
 
 	if cli.opts.Debug {

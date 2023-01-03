@@ -15,7 +15,7 @@ func ExampleJsapiPay() {
 		"mchid":        mchId,
 		"description":  "test pay",
 		"out_trade_no": time.Now().Format("20060102150405"),
-		"notify_url":   fmt.Sprintf("https://idoubi.cc/wxpay/v3/pay-notify/%s", cli.GetMchId()),
+		"notify_url":   fmt.Sprintf("https://xxx.com/wxpay/v3/pay-notify/%s", cli.GetMchId()),
 		"amount": map[string]interface{}{
 			"total": 3,
 		},
