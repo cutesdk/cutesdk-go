@@ -25,23 +25,22 @@ func (n *NotifyMsg) ReceiveId() string {
 type NotifyHandler func(*NotifyMsg) *ReplyMsg
 
 // Listen: listen notify
-func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
+func (svr *Server) Listen(req *http.Request, resp http.ResponseWriter, notifyHandler NotifyHandler) error {
 	params := req.URL.Query()
 
 	echostr := params.Get("echostr")
 
 	if echostr != "" {
 		// verify notify url
-		if err := ins.VerifyNotifyMsg(req, echostr); err != nil {
+		if err := svr.VerifyNotifyMsg(req, echostr); err != nil {
 			return fmt.Errorf("verify notify url failed: %v", err)
 		}
 
-		echoStrB, receiveId, err := crypt.DecryptWithAesKey(ins.opts.aesKey, echostr)
+		echoStrB, receiveId, err := crypt.DecryptWithAesKey(svr.opts.aesKey, echostr)
 		if err != nil {
 			return fmt.Errorf("decrypt echostr failed: %v", err)
 		}
 
-		// todo check receiveId
 		_ = receiveId
 
 		resp.Write(echoStrB)
@@ -49,9 +48,13 @@ func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyH
 		return nil
 	}
 
-	msg, err := ins.GetNotifyMsg(req)
+	msg, err := svr.GetNotifyMsg(req)
 	if err != nil {
 		return fmt.Errorf("get notify message failed: %v", err)
+	}
+
+	if svr.opts.Corpid == "" && msg.receiveId != "" {
+		svr.opts.Corpid = msg.receiveId
 	}
 
 	if notifyHandler == nil {
@@ -61,14 +64,14 @@ func (ins *Instance) Listen(req *http.Request, resp http.ResponseWriter, notifyH
 	replyMsg := notifyHandler(msg)
 
 	if replyMsg == nil {
-		return nil
+		return svr.ReplySuccess(resp)
 	}
 
-	return ins.ReplySuccess(resp)
+	return svr.ReplyEncryptedMsg(resp, replyMsg)
 }
 
 // GetReqBody: get request data in body
-func (ins *Instance) GetReqBody(req *http.Request) ([]byte, error) {
+func (svr *Server) GetReqBody(req *http.Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return nil, fmt.Errorf("invalid notify data: %v", err)
@@ -79,14 +82,14 @@ func (ins *Instance) GetReqBody(req *http.Request) ([]byte, error) {
 }
 
 // VerifyNotifyMsg: verify notify message
-func (ins *Instance) VerifyNotifyMsg(req *http.Request, msgEncrypt string) error {
+func (svr *Server) VerifyNotifyMsg(req *http.Request, msgEncrypt string) error {
 	params := req.URL.Query()
 
 	timestamp := params.Get("timestamp")
 	nonce := params.Get("nonce")
 	msgSignature := params.Get("msg_signature")
 
-	calSign := crypt.GenMsgSignature(ins.opts.VerifyToken, timestamp, nonce, msgEncrypt)
+	calSign := crypt.GenMsgSignature(svr.opts.VerifyToken, timestamp, nonce, msgEncrypt)
 	if calSign != msgSignature {
 		return fmt.Errorf("invalid signature")
 	}
@@ -95,8 +98,8 @@ func (ins *Instance) VerifyNotifyMsg(req *http.Request, msgEncrypt string) error
 }
 
 // GetNotifyMsg: get notify message
-func (ins *Instance) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
-	reqBody, err := ins.GetReqBody(req)
+func (svr *Server) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
+	reqBody, err := svr.GetReqBody(req)
 	if err != nil {
 		return nil, err
 	}
@@ -110,12 +113,12 @@ func (ins *Instance) GetNotifyMsg(req *http.Request) (*NotifyMsg, error) {
 	}
 
 	// verify notify message
-	if err := ins.VerifyNotifyMsg(req, msgEncrypt); err != nil {
+	if err := svr.VerifyNotifyMsg(req, msgEncrypt); err != nil {
 		return nil, fmt.Errorf("verify notify msg failed: %v", err)
 	}
 
 	// decrypt message
-	contentB, receiveId, err := crypt.DecryptWithAesKey(ins.opts.aesKey, msgEncrypt)
+	contentB, receiveId, err := crypt.DecryptWithAesKey(svr.opts.aesKey, msgEncrypt)
 	if err != nil {
 		return nil, fmt.Errorf("decrypt message failed: %v", err)
 	}

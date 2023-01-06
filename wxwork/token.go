@@ -3,12 +3,12 @@ package wxwork
 import "github.com/cutesdk/cutesdk-go/common/request"
 
 // FetchAccessToken: request get_access_token api
-func (ins *Instance) FetchAccessToken() (*request.Result, error) {
+func (cli *Client) FetchAccessToken() (*request.Result, error) {
 	uri := "/cgi-bin/gettoken"
 
-	res, err := ins.Get(uri, map[string]interface{}{
-		"corpid":     ins.opts.Corpid,
-		"corpsecret": ins.opts.Secret,
+	res, err := cli.Get(uri, map[string]interface{}{
+		"corpid":     cli.opts.Corpid,
+		"corpsecret": cli.opts.Secret,
 	})
 
 	return res, err

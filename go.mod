@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/idoubi/goutils v1.2.0
-	github.com/idoubi/goz v1.4.1
+	github.com/idoubi/goz v1.4.2
 	github.com/tidwall/gjson v1.14.4
 )
 

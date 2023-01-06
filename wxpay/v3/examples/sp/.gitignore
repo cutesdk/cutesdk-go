@@ -5,4 +5,5 @@ init_test.go
 *.gzip
 *.xls
 *.jpeg
+*.png
 *.bak

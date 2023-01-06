@@ -7,19 +7,19 @@ import (
 
 // AccessToken: default access_token handler
 type AccessToken struct {
-	ins *Instance
+	cli *Client
 }
 
 // NewAccessToken: init access_token handler
-func NewAccessToken(ins *Instance) *AccessToken {
-	return &AccessToken{ins}
+func NewAccessToken(cli *Client) *AccessToken {
+	return &AccessToken{cli}
 }
 
 // GetToken: get access_token, from cache or api
 func (t *AccessToken) GetToken() (string, error) {
-	cacheKey := t.ins.GetAccessTokenCacheKey()
+	cacheKey := t.cli.GetAccessTokenCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// get access_token from cache
 	if v, err := cache.Get(cacheKey); err == nil && v != nil {
@@ -34,12 +34,12 @@ func (t *AccessToken) GetToken() (string, error) {
 
 // RefreshToken: refresh access_token
 func (t *AccessToken) RefreshToken() (string, error) {
-	cacheKey := t.ins.GetAccessTokenCacheKey()
+	cacheKey := t.cli.GetAccessTokenCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// get access_token from api
-	res, err := t.ins.FetchAccessToken()
+	res, err := t.cli.FetchAccessToken()
 	if err != nil {
 		return "", fmt.Errorf("fetch token failed: %v", err)
 	}
@@ -60,9 +60,9 @@ func (t *AccessToken) RefreshToken() (string, error) {
 
 // SetToken: set access_token to cache
 func (t *AccessToken) SetToken(token string, expire time.Duration) error {
-	cacheKey := t.ins.GetAccessTokenCacheKey()
+	cacheKey := t.cli.GetAccessTokenCacheKey()
 
-	cache := t.ins.GetCacheHandler()
+	cache := t.cli.GetCacheHandler()
 
 	// set access_token to cache
 	return cache.Set(cacheKey, token, expire)
