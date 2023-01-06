@@ -15,8 +15,8 @@ func NewServer(opts *Options) (*Server, error) {
 		return nil, err
 	}
 
-	if opts.EncodingAesKey != "" {
-		if v, _ := crypt.Base64Decode(opts.EncodingAesKey + "="); v != nil {
+	if opts.AesKey != "" {
+		if v, _ := crypt.Base64Decode(opts.AesKey + "="); v != nil {
 			opts.aesKey = v
 		}
 	}

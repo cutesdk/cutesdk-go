@@ -83,7 +83,7 @@ func (svr *Server) EncryptReplyMsg(msg *ReplyMsg) ([]byte, error) {
 
 	timestamp := goutils.TimestampStr()
 	nonce := goutils.NonceStr(16)
-	msgSignature := crypt.GenMsgSignature(svr.opts.VerifyToken, timestamp, nonce, msgEncrypt)
+	msgSignature := crypt.GenMsgSignature(svr.opts.Token, timestamp, nonce, msgEncrypt)
 
 	encryptedMsg := &EncryptedMsg{
 		Encrypt:      CDATAText(msgEncrypt),

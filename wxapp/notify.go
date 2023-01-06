@@ -78,7 +78,7 @@ func (svr *Server) VerifyNotifyMsg(req *http.Request, msgEncrypt string) error {
 	nonce := params.Get("nonce")
 	msgSignature := params.Get("signature")
 
-	calSign := crypt.GenMsgSignature(svr.opts.VerifyToken, timestamp, nonce, "")
+	calSign := crypt.GenMsgSignature(svr.opts.Token, timestamp, nonce, "")
 
 	if calSign != msgSignature {
 		return fmt.Errorf("invalid signature")

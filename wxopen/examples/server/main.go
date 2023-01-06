@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	appid          = "wxd19865e64822ff7a"
-	secret         = "d347fdaa99f879099264ad0c072e0181"
-	verifyToken    = "ga55qnibf14sj3bs55xwzekzmuhp52va"
-	encodingAesKey = "lq94ZOugkS4YHsy4REbC4irHTUjX17TmWpbP55gO40j"
+	appid  = "xxx"
+	secret = "xxx"
+	token  = "xxx"
+	aesKey = "xxx"
 )
 
 type Mux struct {
@@ -83,11 +83,11 @@ func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request)
 
 func getServer() *wxopen.Server {
 	opts := &wxopen.Options{
-		Appid:          appid,
-		Secret:         secret,
-		VerifyToken:    verifyToken,
-		EncodingAesKey: encodingAesKey,
-		Debug:          true,
+		Appid:  appid,
+		Secret: secret,
+		Token:  token,
+		AesKey: aesKey,
+		Debug:  true,
 		Cache: &cache.FileOptions{
 			Dir: "../cache",
 		},

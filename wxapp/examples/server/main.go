@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	appid          = "xxx"
-	secret         = "xxx"
-	verifyToken    = "xxx"
-	encodingAesKey = "xxx"
+	appid  = "xxx"
+	secret = "xxx"
+	token  = "xxx"
+	aesKey = "xxx"
 )
 
 type Mux struct {
@@ -95,11 +95,11 @@ func sendTextMsg(cli *wxapp.Client, openid string, content string) error {
 
 func getServer() *wxapp.Server {
 	svr, err := wxapp.NewServer(&wxapp.Options{
-		Appid:          appid,
-		Secret:         secret,
-		VerifyToken:    verifyToken,
-		EncodingAesKey: encodingAesKey,
-		Debug:          true,
+		Appid:  appid,
+		Secret: secret,
+		Token:  token,
+		AesKey: aesKey,
+		Debug:  true,
 		Cache: &cache.FileOptions{
 			Dir: "../cache",
 		},

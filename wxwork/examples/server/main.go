@@ -16,8 +16,8 @@ var (
 	serviceSecret  = "xxx"
 	agentId        = "xxx"
 	agentSecret    = "xxx"
-	verifyToken    = "xxx"
-	encodingAesKey = "xxx"
+	token          = "xxx"
+	aesKey         = "xxx"
 )
 
 type Mux struct {
@@ -80,12 +80,12 @@ func EventNotifyHandler(appid, secret string, resp http.ResponseWriter, req *htt
 
 func getServer(appid, secret string) *wxwork.Server {
 	svr, err := wxwork.NewServer(&wxwork.Options{
-		Corpid:         corpid,
-		Appid:          appid,
-		Secret:         secret,
-		VerifyToken:    verifyToken,
-		EncodingAesKey: encodingAesKey,
-		Debug:          true,
+		Corpid: corpid,
+		Appid:  appid,
+		Secret: secret,
+		Token:  token,
+		AesKey: aesKey,
+		Debug:  true,
 		Cache: &cache.FileOptions{
 			Dir: "../../cache",
 		},

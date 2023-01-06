@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	appid          = "xxx"
-	secret         = "xxx"
-	verifyToken    = "xxx"
-	encodingAesKey = "xxx"
+	appid  = "xxx"
+	secret = "xxx"
+	token  = "xxx"
+	aesKey = "xxx"
 )
 
 type Mux struct {
@@ -67,11 +67,11 @@ func MsgNotifyHandler(appid string, resp http.ResponseWriter, req *http.Request)
 
 func getServer() *wxmp.Server {
 	svr, err := wxmp.NewServer(&wxmp.Options{
-		Appid:          appid,
-		Secret:         secret,
-		VerifyToken:    verifyToken,
-		EncodingAesKey: encodingAesKey,
-		Debug:          true,
+		Appid:  appid,
+		Secret: secret,
+		Token:  token,
+		AesKey: aesKey,
+		Debug:  true,
 		Cache: &cache.FileOptions{
 			Dir: "../cache",
 		},
