@@ -5,15 +5,13 @@ import (
 	"log"
 )
 
-func ExampleGetOauthUrl() {
+func ExampleWxopenGetOauthUrl() {
 	cli := getClient()
 
-	redirectUri := "https://xxx.com/api/callback/"
-	scope := "snsapi_userinfo"
+	redirectUri := "https://xxx.com/wxopen/login/callback/"
+	scope := "snsapi_login"
 	extra := map[string]string{
-		"state":         "test123",
-		"forcePopup":    "false",
-		"forceSnapShot": "false",
+		"state": "test123",
 	}
 
 	oauthUrl, err := cli.GetOauthUrl(redirectUri, scope, extra)
@@ -25,7 +23,7 @@ func ExampleGetOauthUrl() {
 	// Output: xxx
 }
 
-func ExampleGetOauthToken() {
+func ExampleWxopenGetOauthToken() {
 	cli := getClient()
 
 	code := "xxx"
@@ -43,7 +41,7 @@ func ExampleGetOauthToken() {
 	// Output: ok
 }
 
-func ExampleGetOauthUser() {
+func ExampleWxopenGetOauthUser() {
 	cli := getClient()
 
 	oauthAccessToken := "xxx"
