@@ -1,6 +1,10 @@
 package cache
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-redis/redis/v8"
+)
 
 // IOptions: interface of custom cache options
 type IOptions interface {
@@ -32,6 +36,7 @@ func (o *FileOptions) ToOptions() *Options {
 type RedisOptions struct {
 	Dsn     string
 	Timeout time.Duration
+	Client  *redis.Client
 }
 
 // ToOptions: to cache options
@@ -41,6 +46,7 @@ func (o *RedisOptions) ToOptions() *Options {
 		Conf: map[string]interface{}{
 			"dsn":     o.Dsn,
 			"timeout": o.Timeout,
+			"client":  o.Client,
 		},
 	}
 }
