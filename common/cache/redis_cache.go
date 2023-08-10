@@ -18,9 +18,13 @@ type RedisCache struct {
 func NewRedisCache(conf map[string]interface{}) (*RedisCache, error) {
 	timeout := 5 * time.Second
 	if v, ok := conf["timeout"]; ok {
-		ts := v.(string)
-		if t, err := time.ParseDuration(ts); err == nil {
-			timeout = t
+		if td, ok := v.(time.Duration); ok {
+			timeout = td
+		}
+		if ts, ok := v.(string); ok {
+			if t, err := time.ParseDuration(ts); err == nil {
+				timeout = t
+			}
 		}
 	}
 
